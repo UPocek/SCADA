@@ -1,6 +1,7 @@
 ﻿using System;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using scada_back.DTOs;
 
 namespace scada_back.Models
 {
@@ -22,6 +23,15 @@ namespace scada_back.Models
             IsAdmin = isAdmin;
             AnalogInputs = analogInputs;
             DigitalInputs = digitalInputs;
+        }
+
+        public User(UserCredentialsDTO userCredentials)
+        {
+            Username = userCredentials.Username;
+            Password = userCredentials.Password;
+            IsAdmin = false;
+            AnalogInputs = new List<AnalogInput>();
+            DigitalInputs = new List<DigitalInput>();
         }
 
         public User()

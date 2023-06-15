@@ -8,7 +8,7 @@ namespace scada_back.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class UserController
+    public class UserController : ControllerBase
     {
         private UserService _userService;
         public UserController(UserService userService)
@@ -16,10 +16,21 @@ namespace scada_back.Controllers
             _userService = userService;
         }
 
-        [HttpGet]
+        [HttpPost]
         public async Task<User> Registration(UserCredentialsDTO userCredentials)
         {
-            return null;
+            return await _userService.SaveUser(userCredentials);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<User>> Login(UserCredentialsDTO userCredentials)
+        {
+            User loggedInUser = await _userService.GetUser(userCredentials);
+            if (loggedInUser == null)
+            {
+                return NotFound();
+            }
+            return loggedInUser;
         }
     }
 }
