@@ -12,12 +12,14 @@ namespace scada_back.Models
         public int Value { get; set; }
         public double ScanTime { get; set; }
         public string RTUId { get; set; }
+        public string Name { get; set; }
 
-        public AddressValueDigital(int value, double scanTime, string rtu)
+        public AddressValueDigital(int value, double scanTime, string rtu, string name)
         {
             Value = value;
             ScanTime = scanTime;
             RTUId = rtu;
+            Name = name;
         }
 
         public AddressValueDigital()
