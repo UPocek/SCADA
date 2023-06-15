@@ -15,8 +15,9 @@ namespace scada_back.Models
         public string Units { get; set; }
         public double ScanTime { get; set; }
         public string RTUId { get; set; }
+        public string Name { get; set; }
 
-        public AddressValueAnalog(double value, double lowLimit, double highLimit, string units, double scanTime, string rtu)
+        public AddressValueAnalog(double value, double lowLimit, double highLimit, string units, double scanTime, string rtu, string name)
         {
             Value = value;
             LowLimit = lowLimit;
@@ -24,6 +25,7 @@ namespace scada_back.Models
             Units = units;
             ScanTime = scanTime;
             RTUId = rtu;
+            Name = name;
         }
 
         public AddressValueAnalog()

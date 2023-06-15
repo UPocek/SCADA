@@ -42,11 +42,16 @@
     border: 1px solid var(--LightNote);
     border-radius: 8px 0px 0px 8px;
     padding: 0.5rem;
+}
+
+.black{
     background-color: black;
     color: aliceblue;
 }
 
 .offBtn{
+    border: 1px solid var(--LightNote);
+    border-radius: 0px 8px 8px 0px;
     padding: 0.5rem;
 }
 
@@ -55,6 +60,13 @@
     height: 30px;
     border: 1px solid var(--LightNote);
     border-radius: 50%;
-    background-color: green;
     margin: 1rem;
+}
+
+.onSignal{
+    background-color: green;
+}
+
+.offSignal{
+    background-color: yellowgreen;
 }

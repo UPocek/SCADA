@@ -19,7 +19,7 @@ namespace scada_back.Controllers
         [HttpGet]
         public async Task<User> Registration(UserCredentialsDTO userCredentials)
         {
-
+            return null;
         }
     }
 }
