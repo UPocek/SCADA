@@ -54,7 +54,7 @@ namespace scada_back.Services
             }
             if (!_userCollection.Find(user => user.IsAdmin).Any())
             {
-                _userCollection.InsertOne(new User("admin", "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918", "Admin", "Admin", true, new List<AnalogInput>(), new List<DigitalInput>()));
+                _userCollection.InsertOne(new User("admin", "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918", "Admin", "Admin", true, new List<AnalogInput>(), new List<DigitalInput>(), false));
             }
         }
     }
