@@ -5,7 +5,7 @@ using scada_back.DTOs;
 
 namespace scada_back.Models
 {
-    public class AnalogInput : Tag
+    public class AnalogInput : TagMain
     {
         public string Id { get; set; }
         public string Description { get; set; }
@@ -45,7 +45,6 @@ namespace scada_back.Models
             Units = units;
             Value = value;
         }
-
 
         public AnalogInput()
         {

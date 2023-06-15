@@ -1,12 +1,16 @@
 import styles from "../styles/Login.module.css"
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { baseUrl } from "./_app";
 
 export default function LoginPage() {
     const router = useRouter();
     const [credentialsNotValid, setCredentialsNotValid] = useState();
+
+    useEffect(() => {
+        localStorage.getItem('user') != null && router.replace('/');
+    }, [])
 
     const handleSubmit = (event) => {
         event.preventDefault();

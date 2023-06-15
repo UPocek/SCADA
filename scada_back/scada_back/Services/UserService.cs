@@ -55,6 +55,12 @@ namespace scada_back.Services
             await _mongo._userCollection.UpdateOneAsync(u => u.Id == userId, updateUser);
             return newDigitalInput;
         }
+      
+       public async Task DeactivateUser(string userId)
+        {
+            var update = Builders<User>.Update.Set(user => user.Active, false);
+            await _mongo._userCollection.UpdateOneAsync(user => user.Id == userId, update);
+        }
 
         private static string EncriptPassword(string password)
         {
@@ -74,4 +80,3 @@ namespace scada_back.Services
 
     }
 }
-

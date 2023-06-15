@@ -2,7 +2,9 @@
 using System;
 namespace scada_back.Models
 {
-    public class DigitalInput : Tag
+
+    public class DigitalInput : TagMain
+
     {
         public string Id { get; set; }
         public string Description { get; set; }
