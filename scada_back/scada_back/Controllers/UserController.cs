@@ -26,6 +26,9 @@ namespace scada_back.Controllers
         public async Task<ActionResult<User>> Login(UserCredentialsDTO userCredentials)
         {
             User loggedInUser = await _userService.GetUser(userCredentials);
+            System.Diagnostics.Debug.WriteLine("##########");
+            System.Diagnostics.Debug.WriteLine(loggedInUser.Name);
+            System.Diagnostics.Debug.WriteLine("##########");
             if (loggedInUser == null)
             {
                 return NotFound();

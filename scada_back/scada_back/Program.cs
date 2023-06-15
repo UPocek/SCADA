@@ -1,5 +1,6 @@
-﻿using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Options;
 using MongoDB.Driver;
+using scada_back.Hubs;
 using scada_back.Models;
 using scada_back.Services;
 
@@ -19,13 +20,18 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// WebSocket - SignalR
+builder.Services.AddSignalR();
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: MyAllowSpecificOrigins,
                       policy =>
                       {
-                          policy.WithOrigins("*").AllowAnyHeader()
-                                                  .AllowAnyMethod(); ;
+                          policy.WithOrigins("http://localhost:3000")
+                          .AllowAnyHeader()
+                          .AllowAnyMethod()
+                          .AllowCredentials();
                       });
 });
 
@@ -45,5 +51,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.Run();
+app.MapHub<TagsHub>("/hubs/tags");
 
+app.Run();
