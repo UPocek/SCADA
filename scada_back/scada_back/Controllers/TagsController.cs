@@ -1,5 +1,8 @@
 ﻿using System;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
+using scada_back.Hubs;
+using scada_back.Hubs.Clients;
 using scada_back.Models;
 using scada_back.Services;
 

@@ -17,8 +17,9 @@ namespace scada_back.Models
         public bool IsAdmin { get; set; }
         public ICollection<AnalogInput> AnalogInputs { get; set; }
         public ICollection<DigitalInput> DigitalInputs { get; set; }
+        public bool Active { get; set; }
 
-        public User(string username, string password, string name, string surname, bool isAdmin, ICollection<AnalogInput> analogInputs, ICollection<DigitalInput> digitalInputs)
+        public User(string username, string password, string name, string surname, bool isAdmin, ICollection<AnalogInput> analogInputs, ICollection<DigitalInput> digitalInputs, bool active)
         {
             Username = username;
             Password = password;
@@ -27,6 +28,7 @@ namespace scada_back.Models
             IsAdmin = isAdmin;
             AnalogInputs = analogInputs;
             DigitalInputs = digitalInputs;
+            Active = active;
         }
 
         public User(UserCredentialsDTO userCredentials)
@@ -38,6 +40,7 @@ namespace scada_back.Models
             IsAdmin = false;
             AnalogInputs = new List<AnalogInput>();
             DigitalInputs = new List<DigitalInput>();
+            Active = false;
         }
 
         public User()

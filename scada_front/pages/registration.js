@@ -8,6 +8,10 @@ export default function RegistrationPage() {
     const router = useRouter();
     const [formInvalid, setFormInvalide] = useState(false);
 
+    useEffect(() => {
+        localStorage.getItem('user') != null && router.replace('/');
+    }, [])
+
     const handleSubmit = (event) => {
         event.preventDefault();
         const inputs = {
