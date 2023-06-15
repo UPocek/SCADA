@@ -45,15 +45,44 @@ function RTU({ name, tags }) {
 }
 
 function Metering({ tag }) {
-    const [isOn, setIsOn] = useState(false)
+    const [isOn, setIsOn] = useState(false);
+    const [job, setJob] = useState(null);
+    const url = tag['highLimit'] ? `${baseUrl}/Tags/analog/${tag['address']}` : `${baseUrl}/Tags/digital/${tag['address']}`
+    const getRandomValue = tag['highLimit'] ? getRandomAnalog : getRandomDigital
+
+    function getRandomDigital() {
+        return Math.floor(Math.random() * 2);
+    }
+
+    function getRandomAnalog() {
+        return (Math.random() * (tag['highLimit'] - tag['lowLimit']) + tag['lowLimit']).toFixed(2)
+    }
+
+    function TurnOnTag() {
+        setIsOn(true)
+        setJob(setInterval(() => {
+            const signal = getRandomValue()
+            axios.put(url, null, {
+                params: {
+                    value: signal,
+                }
+            })
+            console.log(signal)
+        }, tag['scanTime']))
+    }
+
+    function TurnOffTag() {
+        setIsOn(false)
+        clearInterval(job)
+    }
 
     return <div >
         <p className={styles.meterName}>{tag['name']}</p>
         <div className={styles.metering}>
             <div className={`${styles.signal} ${isOn ? styles.onSignal : styles.offSignal}`}></div>
             <div className={styles.IObtns}>
-                <div className={`${styles.onBtn} ${isOn ? styles.black : ''}`} onClick={() => setIsOn(true)}>On</div>
-                <div className={`${styles.offBtn} ${isOn ? '' : styles.black}`} onClick={() => setIsOn(false)}>Off</div>
+                <div className={`${styles.onBtn} ${isOn ? styles.black : ''}`} onClick={TurnOnTag}>On</div>
+                <div className={`${styles.offBtn} ${isOn ? '' : styles.black}`} onClick={TurnOffTag}>Off</div>
             </div>
         </div>
     </div>

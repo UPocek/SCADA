@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using scada_back.Hubs;
 using scada_back.Models;
