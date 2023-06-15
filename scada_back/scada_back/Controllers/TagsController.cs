@@ -29,6 +29,19 @@ namespace scada_back.Controllers
             return await _tagsService.GetAllDigitalAddressesAsync();
         }
 
+        [HttpPut("digital/{address}")]
+        public async Task<IActionResult> UpdateDigitalTag(string address, int value)
+        {
+            await _tagsService.UpdateDigitalTag(address, value);
+            return Ok();
+        }
+
+        [HttpPut("analog/{address}")]
+        public async Task<IActionResult> UpdateAnalogTag(string address, double value)
+        {
+            await _tagsService.UpdateAnalogTag(address, value);
+            return Ok();
+        }
     }
 }
 

@@ -16,13 +16,13 @@ namespace scada_back.Controllers
             _userService = userService;
         }
 
-        [HttpPost]
+        [HttpPost("registration")]
         public async Task<User> Registration(UserCredentialsDTO userCredentials)
         {
             return await _userService.SaveUser(userCredentials);
         }
 
-        [HttpPost]
+        [HttpPost("login")]
         public async Task<ActionResult<User>> Login(UserCredentialsDTO userCredentials)
         {
             User loggedInUser = await _userService.GetUser(userCredentials);

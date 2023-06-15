@@ -10,6 +10,7 @@ builder.Services.Configure<ScadaDatabaseSettings>(
     builder.Configuration.GetSection("scada"));
 builder.Services.AddSingleton<MongoDBService>();
 builder.Services.AddSingleton<TagsService>();
+builder.Services.AddSingleton<UserService>();
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
@@ -45,3 +46,4 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
