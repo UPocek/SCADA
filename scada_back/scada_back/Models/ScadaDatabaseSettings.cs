@@ -7,7 +7,9 @@ namespace scada_back.Models
 
         public string DatabaseName { get; set; } = null!;
 
-        public string AnalogInputCollectionName { get; set; } = null!;
+        public string AddressValueDigitalCollectionName { get; set; } = null!;
+        public string AddressValueAnalogCollectionName { get; set; } = null!;
+        public string UserCollectionName { get; set; } = null!;
     }
 }
 

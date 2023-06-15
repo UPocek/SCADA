@@ -12,10 +12,15 @@ namespace scada_back.Services
             _mongo = mongoDB;
         }
 
-        public async Task<List<AnalogInput>> GetAllAnalogInputsAsync()
+        public async Task<List<AddressValueAnalog>> GetAllAnalogAddressesAsync()
         {
-            return await _mongo._analogInputsCollection.Find(_ => true).ToListAsync();
+            return await _mongo._addressValueAnalogCollection.Find(_ => true).ToListAsync();
 
+        }
+
+        public async Task<List<AddressValueDigital>> GetAllDigitalAddressesAsync()
+        {
+            return await _mongo._addressValueDigitalCollection.Find(_ => true).ToListAsync();
         }
     }
 }

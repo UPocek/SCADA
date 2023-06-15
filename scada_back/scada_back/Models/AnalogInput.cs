@@ -6,15 +6,15 @@ namespace scada_back.Models
 {
     public class AnalogInput : Tag
     {
-
-        [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
-        public String? Id { get; set; }
-        [BsonElement("Description")]
-        public String Description { get; set; }
-        public String IOAddress { get; set; }
-        public Double ScanTime { get; set; }
-        public ICollection<Alarm> Alarms { get; } = new List<Alarm>();
+        public string Id { get; set; }
+        public string Description { get; set; }
+        public string IOAddress { get; set; }
+        public double ScanTime { get; set; }
+        public ICollection<Alarm> Alarms { get; set; } = new List<Alarm>();
+        public bool OnOffScan { get; set; }
+        public double LowLimit { get; set; }
+        public double HighLimit { get; set; }
+        public string Units { get; set; }
 
         public AnalogInput()
         {

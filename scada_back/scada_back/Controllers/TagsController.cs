@@ -17,11 +17,16 @@ namespace scada_back.Controllers
             _tagsService = tagsService;
         }
 
-        [HttpGet]
-        public async Task<List<AnalogInput>> GetAnalogInputs()
+        [HttpGet("analog")]
+        public async Task<List<AddressValueAnalog>> GetAnalogAddresses()
         {
-            return await _tagsService.GetAllAnalogInputsAsync();
+            return await _tagsService.GetAllAnalogAddressesAsync();
+        }
 
+        [HttpGet("digital")]
+        public async Task<List<AddressValueDigital>> GetDigitalAddresses()
+        {
+            return await _tagsService.GetAllDigitalAddressesAsync();
         }
 
     }

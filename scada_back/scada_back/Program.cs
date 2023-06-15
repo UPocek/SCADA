@@ -1,5 +1,8 @@
-﻿using scada_back.Models;
+﻿using Microsoft.Extensions.Options;
+using MongoDB.Driver;
+using scada_back.Models;
 using scada_back.Services;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,8 +12,6 @@ builder.Services.AddSingleton<MongoDBService>();
 builder.Services.AddSingleton<TagsService>();
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
-
-// Add services to the container.
 
 builder.Services.AddControllers();
 
@@ -29,7 +30,6 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -45,4 +45,3 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
-
