@@ -1,9 +1,10 @@
-import { useRef, useState } from "react"
+import { useState } from "react"
 import styles from "../styles/Registration.module.css"
 import { useRouter } from "next/router";
+import { baseUrl } from "./_app";
+import axios from "axios";
 
 export default function RegistrationPage() {
-    const ref = useRef(null);
     const router = useRouter();
     const [formInvalid, setFormInvalide] = useState(false);
 
@@ -12,11 +13,8 @@ export default function RegistrationPage() {
         const inputs = {
             "name": event.target.name.value,
             "surname": event.target.surname.value,
-            "birthday": event.target.birthday.value,
             "username": event.target.email.value,
-            "email": event.target.email.value,
-            "password": event.target.password.value,
-            "invite": event.target.invite.value
+            "password": event.target.password.value
         }
 
         if (isFormValid(inputs)) {
@@ -62,27 +60,7 @@ function isFormValid(inputs) {
 }
 
 function registerNewUser(inputs, router, setFormInvalide) {
-
-    // if (inputs['invite'] != '') {
-    //     axios.post('https://r7u7c2n6eh.execute-api.eu-central-1.amazonaws.com/Prod/api/resolveInvitation', { 'username': inputs['email'], 'email': inputs['email'], 'preferred_username': inputs['username'], 'name': inputs['name'], 'custom:surname': inputs['surname'], 'custom:birthday': inputs['birthday'], 'inviter': inputs['invite'] })
-    //         .then(response => router.replace('/login'))
-    //         .catch(err => router.replace('/login'));
-    //     return;
-    // }
-
-    // const attributeList = [
-    //     new CognitoUserAttribute({ Name: 'preferred_username', Value: inputs['username'] }),
-    //     new CognitoUserAttribute({ Name: 'name', Value: inputs['name'] }),
-    //     new CognitoUserAttribute({ Name: 'custom:surname', Value: inputs['surname'] }),
-    //     new CognitoUserAttribute({ Name: 'custom:birthday', Value: inputs['birthday'] }),
-    // ]
-    // UserPool.signUp(inputs['email'], inputs['password'], attributeList, null, (err, data) => {
-    //     if (err) {
-    //         console.log(err)
-    //         setFormInvalide(true);
-    //     }
-    //     if (data) {
-    //         router.replace('/login');
-    //     }
-    // });
+    axios.post(`${baseUrl}/User/registration`, { 'username': inputs['username'], 'password': inputs['password'], 'name': inputs['name'], 'surname': inputs['surname'] })
+        .then(response => router.replace('/login'))
+        .catch(err => setFormInvalide(true));
 }

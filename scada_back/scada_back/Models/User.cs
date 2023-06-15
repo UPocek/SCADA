@@ -12,14 +12,18 @@ namespace scada_back.Models
         public string? Id { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
+        public string Name { get; set; }
+        public string Surname { get; set; }
         public bool IsAdmin { get; set; }
         public ICollection<AnalogInput> AnalogInputs { get; set; }
         public ICollection<DigitalInput> DigitalInputs { get; set; }
 
-        public User(string username, string password, bool isAdmin, ICollection<AnalogInput> analogInputs, ICollection<DigitalInput> digitalInputs)
+        public User(string username, string password, string name, string surname, bool isAdmin, ICollection<AnalogInput> analogInputs, ICollection<DigitalInput> digitalInputs)
         {
             Username = username;
             Password = password;
+            Name = name;
+            Surname = surname;
             IsAdmin = isAdmin;
             AnalogInputs = analogInputs;
             DigitalInputs = digitalInputs;
@@ -29,6 +33,8 @@ namespace scada_back.Models
         {
             Username = userCredentials.Username;
             Password = userCredentials.Password;
+            Name = userCredentials.Name;
+            Surname = userCredentials.Surname;
             IsAdmin = false;
             AnalogInputs = new List<AnalogInput>();
             DigitalInputs = new List<DigitalInput>();

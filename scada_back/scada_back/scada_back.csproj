@@ -18,10 +18,14 @@
     <None Remove="Models\" />
     <None Remove="Services\" />
     <None Remove="DTOs\" />
+    <None Remove="Hubs\" />
+    <None Remove="Hubs\Clients\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Models\" />
     <Folder Include="Services\" />
     <Folder Include="DTOs\" />
+    <Folder Include="Hubs\" />
+    <Folder Include="Hubs\Clients\" />
   </ItemGroup>
 </Project>

@@ -1,6 +1,8 @@
 import styles from "../styles/Login.module.css"
 import { useRouter } from "next/router";
 import { useState } from "react";
+import axios from "axios";
+import { baseUrl } from "./_app";
 
 export default function LoginPage() {
     const router = useRouter();
@@ -13,7 +15,7 @@ export default function LoginPage() {
         if (username == '' || password == '') {
             alert("You didn't fill out the form properly. Try again.");
         } else {
-            login({ username: username, password: password }, router, setCredentialsNotValid)
+            login({ 'username': username, 'password': password }, router, setCredentialsNotValid)
         }
     }
     return <div className={styles.registrationDiv}>
@@ -40,29 +42,7 @@ export default function LoginPage() {
 }
 
 function login(credentials, router, setCredentialsNotValid) {
-    const user = new CognitoUser({
-        Username: credentials['username'],
-        Pool: UserPool
-    });
-    const authDetails = new AuthenticationDetails({
-        Username: credentials['username'],
-        Password: credentials['password']
-    });
-
-    user.authenticateUser(authDetails, {
-        onSuccess: (data) => {
-            localStorage.setItem('accessToken', data.accessToken.jwtToken);
-            localStorage.setItem('idToken', data.idToken.jwtToken);
-            localStorage.setItem('refreshToken', data.refreshToken.token);
-            router.replace('/');
-        },
-        onFailure: (err) => {
-            console.log(err);
-            setCredentialsNotValid(true);
-        },
-        newPasswordRequired: (data) => {
-            console.log(data);
-            router.replace('/reset-password');
-        }
-    });
+    axios.post(`${baseUrl}/User/login`, { 'username': credentials['username'], 'password': credentials['password'] })
+        .then(response => { localStorage.setItem('user', JSON.stringify(response.data)); router.replace('/') })
+        .catch(err => setCredentialsNotValid(true));
 }
