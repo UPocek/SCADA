@@ -65,13 +65,15 @@ namespace scada_back.Controllers
                 return NotFound();
             }
             return newTag;
+        }
 
         [HttpPut("logout")]
-        public async Task Logout(string userId)
+        public async Task<ActionResult> Logout(string userId)
         {
             await _userService.DeactivateUser(userId);
-
+            return Ok();
         }
     }
 }
+
 

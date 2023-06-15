@@ -1,4 +1,3 @@
-import Head from 'next/head'
 import Image from 'next/image'
 import styles from '@/styles/Home.module.css'
 import NavBar from '@/components/navbar'
@@ -12,7 +11,7 @@ import { useRouter } from 'next/router'
 export default function Home() {
   const router = useRouter();
   const [connection, setConnection] = useState(null);
-   const [user, setUser] = useState({})
+  const [user, setUser] = useState({})
   const [tags, setTags] = useState([])
   const [availableAnalogAddresses, setAvailableAnalogAddresses] = useState([])
   const [availableDigitalAddresses, setAvailableDigitalAddresses] = useState([])
@@ -31,7 +30,7 @@ export default function Home() {
     }
 
   }, [])
-  
+
   useEffect(() => {
     localStorage.getItem('user') == null && router.replace('/login');
     const newConnection = new HubConnectionBuilder()
@@ -66,7 +65,6 @@ export default function Home() {
         }
       }
     }
-
     setAddresses(newAddresses)
   }
 

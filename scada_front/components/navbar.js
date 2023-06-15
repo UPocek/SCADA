@@ -11,11 +11,10 @@ export default function NavBar() {
         const userString = localStorage.getItem('user');
         userString && notifyServer(JSON.parse(userString)['id']);
         localStorage.clear();
-        Router.replace("/login");
     }
 
     function notifyServer(userId) {
-        axios.put(`${baseUrl}/User/logout?userId=${userId}`).then(response => console.log("Log out")).catch(err => console.log("Log out failed"));
+        axios.put(`${baseUrl}/User/logout?userId=${userId}`).then(response => Router.replace("/login")).catch(err => console.log(err));
     }
 
     const menuItems = ['Control Panel', 'Monitoring'];

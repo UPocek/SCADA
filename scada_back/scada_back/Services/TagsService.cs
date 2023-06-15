@@ -45,11 +45,11 @@ namespace scada_back.Services
 
         public void RunUserThreads(User user)
         {
-            foreach (AnalogInput analogInput in user.AnalogInputs)
+            foreach (var analogInput in user.AnalogInputs)
             {
                 StartAnalogTagThread(analogInput, user);
             }
-            foreach (DigitalInput digitalInput in user.DigitalInputs)
+            foreach (var digitalInput in user.DigitalInputs)
             {
                 StartDigitalTagThread(digitalInput, user);
             }
@@ -126,6 +126,7 @@ namespace scada_back.Services
         {
             var tag = await _mongo._addressValueAnalogCollection.Find(item => item.Address == analogInput.IOAddress).SingleOrDefaultAsync();
             user.AnalogInputs.Where(input => input.Id == analogInput.Id).Single().Value = tag.Value;
+            user.Active = false;
             await _mongo._userCollection.ReplaceOneAsync(item => item.Id == user.Id, user);
         }
 
@@ -133,6 +134,7 @@ namespace scada_back.Services
         {
             var tag = await _mongo._addressValueDigitalCollection.Find(item => item.Address == digitalInput.IOAddress).SingleOrDefaultAsync();
             user.DigitalInputs.Where(input => input.Id == digitalInput.Id).Single().Value = tag.Value;
+            user.Active = false;
             await _mongo._userCollection.ReplaceOneAsync(item => item.Id == user.Id, user);
         }
     }

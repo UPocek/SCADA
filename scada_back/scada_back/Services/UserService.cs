@@ -19,15 +19,22 @@ namespace scada_back.Services
 
         public async Task<User> SaveUser(UserCredentialsDTO userCredentials)
         {
+            if (await _mongo._userCollection.Find(user => user.Username == userCredentials.Username).AnyAsync())
+            {
+                throw new Exception("User with that username already exists");
+            }
             userCredentials.Password = EncriptPassword(userCredentials.Password);
             var userToInsert = new User(userCredentials);
             await _mongo._userCollection.InsertOneAsync(userToInsert);
-            return await _mongo._userCollection.Find(item => item.Username == userToInsert.Username).SingleAsync();
+            return userToInsert;
         }
 
         public async Task<User> GetUser(UserCredentialsDTO userCredentials)
         {
-            return await _mongo._userCollection.Find(item => item.Username == userCredentials.Username && item.Password == EncriptPassword(userCredentials.Password)).SingleOrDefaultAsync();
+            var update = Builders<User>.Update.Set(user => user.Active, true);
+            var options = new FindOneAndUpdateOptions<User> { ReturnDocument = ReturnDocument.After };
+            User user = await _mongo._userCollection.FindOneAndUpdateAsync<User>(item => item.Username == userCredentials.Username && item.Password == EncriptPassword(userCredentials.Password), update, options);
+            return user;
         }
 
         public async Task<AnalogInput> AddNewAnalogTag(AnalogTagDTO newTag, string userId)
@@ -55,8 +62,8 @@ namespace scada_back.Services
             await _mongo._userCollection.UpdateOneAsync(u => u.Id == userId, updateUser);
             return newDigitalInput;
         }
-      
-       public async Task DeactivateUser(string userId)
+
+        public async Task DeactivateUser(string userId)
         {
             var update = Builders<User>.Update.Set(user => user.Active, false);
             await _mongo._userCollection.UpdateOneAsync(user => user.Id == userId, update);
@@ -76,7 +83,5 @@ namespace scada_back.Services
                 return builder.ToString();
             }
         }
-
-
     }
 }
