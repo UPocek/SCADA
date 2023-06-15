@@ -1,7 +1,10 @@
-﻿using System;
+﻿using scada_back.DTOs;
+using System;
 namespace scada_back.Models
 {
+
     public class DigitalInput : TagMain
+
     {
         public string Id { get; set; }
         public string Description { get; set; }
@@ -17,6 +20,16 @@ namespace scada_back.Models
             IOAddress = iOAddress;
             ScanTime = scanTime;
             OnOffScan = onOffScan;
+            Value = value;
+        }
+
+        public DigitalInput(DigitalTagDTO digitalTagDTO, int value)
+        {
+            Id = Guid.NewGuid().ToString();
+            Description = digitalTagDTO.Description;
+            IOAddress = digitalTagDTO.IOAddress;
+            ScanTime = digitalTagDTO.ScanTime;
+            OnOffScan = true;
             Value = value;
         }
 

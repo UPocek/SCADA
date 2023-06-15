@@ -1,6 +1,7 @@
 ﻿using System;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using scada_back.DTOs;
 
 namespace scada_back.Models
 {
@@ -27,6 +28,20 @@ namespace scada_back.Models
             OnOffScan = onOffScan;
             LowLimit = lowLimit;
             HighLimit = highLimit;
+            Units = units;
+            Value = value;
+        }
+
+        public AnalogInput(AnalogTagDTO analogTagDTO, string units, double value)
+        {
+            Id = Guid.NewGuid().ToString();
+            Description = analogTagDTO.Description;
+            IOAddress = analogTagDTO.IOAddress;
+            ScanTime = analogTagDTO.ScanTime;
+            Alarms = new List<Alarm>();
+            OnOffScan = true;
+            LowLimit = analogTagDTO.LowLimit;
+            HighLimit = analogTagDTO.HighLimit;
             Units = units;
             Value = value;
         }

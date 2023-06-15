@@ -44,10 +44,33 @@ namespace scada_back.Controllers
             return loggedInUser;
         }
 
+
+        [HttpPost("{userId}/addTag/analog")]
+        public async Task<ActionResult<AnalogInput>> AddNewAnalogTag(string userId, AnalogTagDTO analogTag)
+        {
+            AnalogInput newTag = await _userService.AddNewAnalogTag(analogTag, userId);
+            if (newTag == null)
+            {
+                return NotFound();
+            }
+            return newTag;
+        }
+
+        [HttpPost("{userId}/addTag/digital")]
+        public async Task<ActionResult<DigitalInput>> AddNewDigitalTag(string userId, DigitalTagDTO digitalTag)
+        {
+            DigitalInput newTag = await _userService.AddNewDigitalTag(digitalTag, userId);
+            if (newTag == null)
+            {
+                return NotFound();
+            }
+            return newTag;
+
         [HttpPut("logout")]
         public async Task Logout(string userId)
         {
             await _userService.DeactivateUser(userId);
+
         }
     }
 }

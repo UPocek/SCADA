@@ -8,8 +8,8 @@ export default function RTUPage() {
 
     useEffect(() => {
         let tags = []
-        axios.get(`${baseUrl}/Tags/analog`).then(response => tags.push(...response.data)).catch(err => console.log("Greska pri dobavljanju analognih tagova"))
-        axios.get(`${baseUrl}/Tags/digital`).then(response => { tags.push(...response.data); unpackTags(tags) }).catch(err => console.log("Greska pri dobavljanju digitalnih tagova"))
+        axios.get(`${baseUrl}/Tags/analog`).then(response => tags.push(...response.data)).catch(err => console.log("Error on analog addresses"))
+        axios.get(`${baseUrl}/Tags/digital`).then(response => { tags.push(...response.data); unpackTags(tags) }).catch(err => console.log("Error on digital addresses"))
     }, []
     )
 
