@@ -53,9 +53,7 @@ export default function Home() {
       connectionTags.start()
         .then(result => {
           console.log('Connected to Tags!');
-
           connectionTags.on('ReceiveMessage', message => {
-            console.log(message);
             updateTag(message['tag'], message['value'])
           });
         })
@@ -67,10 +65,10 @@ export default function Home() {
           console.log('Connected to Alarms!');
 
           connectionAlarms.on('ReceiveMessage', message => {
-            if (message['user'] == getUserId() && activeAlarms.filter(alarm => alarm['address'] == message['address']).length == 0) {
-              let alarms = [...activeAlarms];
-              alarms.push(message);
-              setActiveAlarms(alarms);
+            if (message['user'] == getUserId() && activeAlarms.filter(alarm => alarm['message'] == message['message']).length == 0) {
+              let alarmsNew = [...activeAlarms];
+              alarmsNew.push(message);
+              setActiveAlarms(alarmsNew);
             }
           });
         })
@@ -141,7 +139,7 @@ function AllTags({ tags, availableAnalogAddresses, availableDigitalAddresses, se
         {addDigitalTag && <NewDigitalTag availableAddresses={availableDigitalAddresses} setAddDigitalTag={setAddDigitalTag} setAvailableAddresses={setAvailableDigitalAddresses} tags={tags} setTags={setTags} />}
       </div>
       <div className={styles.alarms}>
-        {activeAlarms.map(alarm => <Alarm key={alarm['address']} alarm={alarm} activeAlarms={activeAlarms} setActiveAlarms={setActiveAlarms} />)}
+        {activeAlarms.map(alarm => <Alarm key={alarm['message']} alarm={alarm} activeAlarms={activeAlarms} setActiveAlarms={setActiveAlarms} />)}
       </div>
     </div>
   );
@@ -387,20 +385,20 @@ function Alarm({ alarm, activeAlarms, setActiveAlarms }) {
 
   function discardAlarm() {
     let newAlarms = [...activeAlarms];
-    newAlarms = newAlarms.filter(item => item['address'] != alarm['address']);
+    newAlarms = newAlarms.filter(item => (item['message'] != alarm['message']));
     setActiveAlarms(newAlarms);
   }
 
   return <div className={`${styles.alarm} alarm${alarm['priority']}`}>
     <div>
-      <Image src={`/images/alarm${alarm['priority']}`} width={30} height={30} alt={`Alarm ${alarm['priority']}`} />
+      <Image src={`/images/alarm${alarm['priority']}.png`} width={50} height={50} alt={`Alarm ${alarm['priority']}`} />
     </div>
     <div className={styles.alarmContent}>
-      <h2>{alarm}</h2>
+      <h3>{alarm['message']}</h3>
       <p>{alarm['priority'] == '1' ? 'Important' : alarm['priority'] == '2' ? 'Urgent' : 'Critical'}</p>
     </div>
     <div>
-      <Image src={`/images/x-mark`} width={30} height={30} alt='X' onClick={discardAlarm} />
+      <Image className={styles.cross} src={`/images/x-mark.png`} width={30} height={30} alt='X' onClick={discardAlarm} />
     </div>
   </div>
 }

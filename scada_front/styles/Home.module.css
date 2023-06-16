@@ -12,18 +12,23 @@
 }
 
 .alarm {
+  padding: 20px;
   display: flex;
   flex-direction: row;
+  align-items: center;
+  gap: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
 }
 
 .alarmContent {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
 }
 
-.alarm>p {
-  margin-left: 1.5rem;
+.alarmContent>p,
+.alarmContent h3 {
+  margin: 0;
 }
 
 .tags {
@@ -111,4 +116,8 @@
 
 .addAlarm {
   background-color: var(--Note);
+}
+
+.cross {
+  cursor: pointer;
 }
