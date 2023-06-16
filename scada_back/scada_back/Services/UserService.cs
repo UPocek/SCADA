@@ -85,7 +85,7 @@ namespace scada_back.Services
             await _mongo._userCollection.UpdateOneAsync(u => u.Id == userId, updateUser);
         }
 
-        public async Task DeleteAnalogAlarm(string userId, string ioAddress)
+        public async Task DeleteAnalogTag(string userId, string ioAddress)
         {
             User user = await _mongo._userCollection.Find(item => item.Id == userId).SingleOrDefaultAsync();
             var analogInputs = user.AnalogInputs;
@@ -96,7 +96,7 @@ namespace scada_back.Services
             await _mongo._userCollection.UpdateOneAsync(u => u.Id == userId, updateUser);
         }
 
-        public async Task DeleteDigitalAlarm(string userId, string ioAddress)
+        public async Task DeleteDigitalTag(string userId, string ioAddress)
         {
             User user = await _mongo._userCollection.Find(item => item.Id == userId).SingleOrDefaultAsync();
             var digitalInputs = user.DigitalInputs;
@@ -110,6 +110,17 @@ namespace scada_back.Services
         {
             var update = Builders<User>.Update.Set(user => user.Active, false);
             await _mongo._userCollection.UpdateOneAsync(user => user.Id == userId, update);
+        }
+
+        public async Task AddAlarm(string userId, string ioAddress, AlarmDTO alarm)
+        {
+            User user = await _mongo._userCollection.Find(item => item.Id == userId).SingleOrDefaultAsync();
+            var analogInputs = user.AnalogInputs;
+
+            analogInputs.Where(ai => ai.IOAddress == ioAddress).Single().Alarms.Add(new Alarm(alarm));
+
+            var updateUser = Builders<User>.Update.Set("AnalogInputs", analogInputs);
+            await _mongo._userCollection.UpdateOneAsync(u => u.Id == userId, updateUser);
         }
 
         private static string EncriptPassword(string password)

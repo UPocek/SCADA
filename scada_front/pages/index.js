@@ -33,18 +33,18 @@ export default function Home() {
   }, [])
 
   useEffect(() => {
-    // localStorage.getItem('user') == null && router.replace('/login');
-    // const newConnectionTags = new HubConnectionBuilder()
-    //   .withUrl('https://localhost:7214/hubs/tags')
-    //   .withAutomaticReconnect()
-    //   .build();
-    // const newConnectionAlarms = new HubConnectionBuilder()
-    //   .withUrl('https://localhost:7214/hubs/alarms')
-    //   .withAutomaticReconnect()
-    //   .build();
+    localStorage.getItem('user') == null && router.replace('/login');
+    const newConnectionTags = new HubConnectionBuilder()
+      .withUrl('https://localhost:7214/hubs/tags')
+      .withAutomaticReconnect()
+      .build();
+    const newConnectionAlarms = new HubConnectionBuilder()
+      .withUrl('https://localhost:7214/hubs/alarms')
+      .withAutomaticReconnect()
+      .build();
 
-    // setConnectionTags(newConnectionTags);
-    // setConnectionAlarms(newConnectionAlarms);
+    setConnectionTags(newConnectionTags);
+    setConnectionAlarms(newConnectionAlarms);
   }, []);
 
   useEffect(() => {
@@ -329,22 +329,22 @@ function NewDigitalTag({ availableAddresses, setAddDigitalTag, setAvailableAddre
 }
 
 function NewAlarm({ tag, addNewAlarm, setAddNewAlarm }) {
-  const [direction, setDirection] = useState('notify_if_greater')
-  const [value, setValue] = useState(null)
-  const [priority, setPriority] = useState('1')
+  const [direction, setDirection] = useState('notify_if_greater');
+  const [alarmValue, setValue] = useState('');
+  const [priority, setPriority] = useState('1');
 
   function AddNewTagAlarm() {
-    if (value == null) {
+    if (alarmValue == null || alarmValue == '' || alarmValue.startsWith('e')) {
       alert("Invalid inputs!")
       return;
     }
     const alarm = {
       'direction': direction,
-      'value': value,
+      'value': +alarmValue,
       'priority': priority
     }
 
-    axios.put(`${baseUrl}/User/${getUserId()}/analog/${tag['ioAddress']}`, alarm).then(_ => setAddNewAlarm(false)).catch(err => console.log("Error on addNewAlarm"))
+    axios.post(`${baseUrl}/User/${getUserId()}/alarm/${tag['ioAddress']}`, alarm).then(_ => { setAddNewAlarm(false); alert("Alarm added successfully.") }).catch(err => console.log("Error on addNewAlarm"))
 
   }
 
@@ -358,7 +358,7 @@ function NewAlarm({ tag, addNewAlarm, setAddNewAlarm }) {
     </td>
     <td>then</td>
     <td>
-      <input className={styles.inputField} type="number" id="value" name="value" value={value} onChange={e => setValue(e.target.value)} placeholder='Specific value' />
+      <input className={styles.inputField} type="number" id="value" name="value" value={alarmValue} onChange={e => setValue(e.target.value)} placeholder='Specific value' />
     </td>
     <td>
       <span>Priority: </span>
