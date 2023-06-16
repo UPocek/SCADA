@@ -17,7 +17,7 @@ export default function NavBar() {
         axios.put(`${baseUrl}/User/logout?userId=${userId}`).then(response => Router.replace("/login")).catch(err => console.log(err));
     }
 
-    const menuItems = ['Control Panel', 'Monitoring'];
+    const menuItems = ['Control Panel', 'Reports'];
 
     return (
         <nav className={navStyle.navbarStyle}>
@@ -25,7 +25,8 @@ export default function NavBar() {
                 <Image src="/images/logo.png" width={190} height={60} alt='WebSecurity Logo' />
             </Link>
             <ul className={navStyle.navUl}>
-                {menuItems.map(item => <li key={item}><Link href={`/${item != 'Home' ? item.toLowerCase() : ''}`} className={navStyle.navItem}>{item}</Link></li>)}
+                <li><Link className={navStyle.navItem} href="/" >Control Panel</Link></li>
+                <li><Link className={navStyle.navItem} href="/reports">Reports</Link></li>
             </ul>
             <ul className={navStyle.navUl}>
                 <Link className={navStyle.signOut} href="/" onClick={logOut}>Sign out</Link>

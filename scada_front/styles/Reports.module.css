@@ -1,0 +1,38 @@
+.container{
+    display: flex;
+    margin: 0 auto;
+    margin-top: 20vh;
+}
+
+.sideBar{
+    margin-left: 2rem;
+    width: 30%;
+    background: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--LightNote);
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.option{
+    padding: 1rem;
+    font-size: 20px;
+}
+
+.selected{
+    background-color: black;
+    color: aliceblue;
+    border: 1px solid var(--LightNote);
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.report{
+    margin-left: 2rem;
+    width: 60%;
+    background: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--LightNote);
+    border-radius: 8px;
+    padding: 1rem;
+}
