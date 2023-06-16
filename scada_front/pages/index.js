@@ -385,7 +385,6 @@ function Alarm() {
       </div>
     </div>
     <p>Alarm description</p>
-
   </div>
 }
 

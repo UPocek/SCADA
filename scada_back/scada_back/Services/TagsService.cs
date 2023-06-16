@@ -37,12 +37,14 @@ namespace scada_back.Services
         {
             var updateTag = Builders<AddressValueDigital>.Update.Set("Value", value);
             await _mongo._addressValueDigitalCollection.UpdateOneAsync(tag => tag.Address == address, updateTag);
+            SaveCurrentValueForHistory(address, value);
         }
 
         public async Task UpdateAnalogTag(string address, double value)
         {
             var updateTag = Builders<AddressValueAnalog>.Update.Set("Value", value);
             await _mongo._addressValueAnalogCollection.UpdateOneAsync(tag => tag.Address == address, updateTag);
+            SaveCurrentValueForHistory(address, value);
         }
 
         public void RunUserThreads(User user)
@@ -85,13 +87,19 @@ namespace scada_back.Services
                         AddressValueAnalog tag = await _mongo._addressValueAnalogCollection.Find(item => item.Address == analogInput.IOAddress).SingleOrDefaultAsync();
                         if (tag is null) { break; }
                         NotifyAnalogAlarms(user, tag, (List<Alarm>)analogInput.Alarms, analogInput);
-                        sendTagMessage(new TagMessageDTO(user.Id, analogInput.Id, CapValue(analogInput.LowLimit, analogInput.HighLimit, tag.Value)));
+                        SendTagMessage(new TagMessageDTO(user.Id, analogInput.Id, CapValue(analogInput.LowLimit, analogInput.HighLimit, tag.Value)));
+                        SaveCurrentAnalogTagValue(analogInput, tag);
                     }
 
                     Thread.Sleep(analogInput.ScanTime);
                 }
 
             }).Start();
+        }
+
+        private async void SaveCurrentValueForHistory(string address, double value)
+        {
+            await _mongo._historyCollection.InsertOneAsync(new HistoryInstance(address, value, DateTime.Now));
         }
 
         private void StartDigitalTagThread(DigitalInput? digitalInput, User user)
@@ -121,9 +129,10 @@ namespace scada_back.Services
 
                     if (digitalInput.OnOffScan)
                     {
-                        var tag = await _mongo._addressValueDigitalCollection.Find(item => item.Address == digitalInput.IOAddress).SingleOrDefaultAsync();
+                        AddressValueDigital tag = await _mongo._addressValueDigitalCollection.Find(item => item.Address == digitalInput.IOAddress).SingleOrDefaultAsync();
                         if (tag is null) { break; }
-                        sendTagMessage(new TagMessageDTO(user.Id, digitalInput.Id, tag.Value));
+                        SendTagMessage(new TagMessageDTO(user.Id, digitalInput.Id, tag.Value));
+                        SaveCurrentDigitalTagValue(digitalInput, tag);
                     }
 
                     Thread.Sleep(digitalInput.ScanTime);
@@ -138,11 +147,15 @@ namespace scada_back.Services
             {
                 if (alarm.Direction == "notify_if_greater" && tag.Value > alarm.Value)
                 {
-                    sendAlarmMessage(new AlarmMessageDTO(user.Id, $"{tag.Address} - {analogInput.Description} has exceeded {alarm.Value}{tag.Units}", alarm.Priority));
+                    SendAlarmMessage(new AlarmMessageDTO(user.Id, $"{tag.Address} - {analogInput.Description} has exceeded {alarm.Value}{tag.Units}", alarm.Priority));
+                    WriteLog($"{tag.Address} - {analogInput.Description} has exceeded {alarm.Value}{tag.Units}");
+                    SaveAlarm(tag, alarm, analogInput);
                 }
                 else if (alarm.Direction == "notify_if_lower" && tag.Value < alarm.Value)
                 {
-                    sendAlarmMessage(new AlarmMessageDTO(user.Id, $"{tag.Address} - {analogInput.Description} is below {alarm.Value}{tag.Units}", alarm.Priority));
+                    SendAlarmMessage(new AlarmMessageDTO(user.Id, $"{tag.Address} - {analogInput.Description} is below {alarm.Value}{tag.Units}", alarm.Priority));
+                    WriteLog($"{tag.Address} - {analogInput.Description} is below {alarm.Value}{tag.Units}");
+                    SaveAlarm(tag, alarm, analogInput);
                 }
             }
         }
@@ -152,14 +165,40 @@ namespace scada_back.Services
             return Math.Min(Math.Max(min, value), max);
         }
 
-        private async void sendTagMessage(TagMessageDTO message)
+        private async void SendTagMessage(TagMessageDTO message)
         {
             await _tagsHub.Clients.All.ReceiveMessage(message);
         }
 
-        private async void sendAlarmMessage(AlarmMessageDTO message)
+        private async void SendAlarmMessage(AlarmMessageDTO message)
         {
             await _alarmsHub.Clients.All.ReceiveMessage(message);
+        }
+
+        private static void WriteLog(string message)
+        {
+            string logFileName = @"scada.log";
+
+            using (StreamWriter sw = File.AppendText(logFileName))
+            {
+                sw.WriteLine(message);
+            }
+
+        }
+
+        private async void SaveAlarm(AddressValueAnalog tag, Alarm alarm, AnalogInput analogInput)
+        {
+            await _mongo._alarmCollection.InsertOneAsync(new AlarmInstance(DateTime.Now, alarm.Direction, alarm.Value, alarm.Priority, analogInput.Id, analogInput.IOAddress, tag.Units));
+        }
+
+        private async void SaveCurrentAnalogTagValue(AnalogInput input, AddressValueAnalog tag)
+        {
+            await _mongo._tagvalueCollection.InsertOneAsync(new TagValueInstance(input.Id, input.Description, tag.Value, tag.Units, tag.Address));
+        }
+
+        private async void SaveCurrentDigitalTagValue(DigitalInput input, AddressValueDigital tag)
+        {
+            await _mongo._tagvalueCollection.InsertOneAsync(new TagValueInstance(input.Id, input.Description, tag.Value, "on/off", tag.Address));
         }
 
         private async void SaveLastAnalogValue(AnalogInput analogInput, User user)
