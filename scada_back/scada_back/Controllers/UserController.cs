@@ -67,6 +67,34 @@ namespace scada_back.Controllers
             return newTag;
         }
 
+        [HttpPut("{userId}/scanOnOff/analog/{ioAddress}")]
+        public async Task<ActionResult> ChangeAnalogScanOnOff(string userId, string ioAddress, bool answer)
+        {
+            await _userService.ChangeAnalogScanOnOff(userId, ioAddress, answer);
+            return Ok();
+        }
+
+        [HttpPut("{userId}/scanOnOff/digital/{ioAddress}")]
+        public async Task<ActionResult> ChangeDigitalScanOnOff(string userId, string ioAddress, bool answer)
+        {
+            await _userService.ChangeDigitalScanOnOff(userId, ioAddress, answer);
+            return Ok();
+        }
+
+        [HttpPut("{userId}/analog/{ioAddress}")]
+        public async Task<ActionResult> DeleteAnalogAlarm(string userId, string ioAddress)
+        {
+            await _userService.DeleteAnalogAlarm(userId, ioAddress);
+            return Ok();
+        }
+
+        [HttpPut("{userId}/digital/{ioAddress}")]
+        public async Task<ActionResult> DeleteDigitalAlarm(string userId, string ioAddress)
+        {
+            await _userService.DeleteDigitalAlarm(userId, ioAddress);
+            return Ok();
+        }
+
         [HttpPut("logout")]
         public async Task<ActionResult> Logout(string userId)
         {
