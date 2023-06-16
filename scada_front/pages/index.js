@@ -10,7 +10,8 @@ import { useRouter } from 'next/router'
 
 export default function Home() {
   const router = useRouter();
-  const [connection, setConnection] = useState(null);
+  const [connectionTags, setConnectionTags] = useState(null);
+  const [connectionAlarms, setConnectionAlarms] = useState(null);
   const [user, setUser] = useState({})
   const [tags, setTags] = useState([])
   const [availableAnalogAddresses, setAvailableAnalogAddresses] = useState([])
@@ -33,27 +34,43 @@ export default function Home() {
 
   useEffect(() => {
     localStorage.getItem('user') == null && router.replace('/login');
-    const newConnection = new HubConnectionBuilder()
+    const newConnectionTags = new HubConnectionBuilder()
       .withUrl('https://localhost:7214/hubs/tags')
       .withAutomaticReconnect()
       .build();
+    const newConnectionAlarms = new HubConnectionBuilder()
+      .withUrl('https://localhost:7214/hubs/alarms')
+      .withAutomaticReconnect()
+      .build();
 
-    setConnection(newConnection);
+    setConnectionTags(newConnectionTags);
+    setConnectionAlarms(newConnectionAlarms);
   }, []);
 
   useEffect(() => {
-    if (connection) {
-      connection.start()
+    if (connectionTags) {
+      connectionTags.start()
         .then(result => {
-          console.log('Connected!');
+          console.log('Connected to Tags!');
 
-          connection.on('ReceiveMessage', message => {
+          connectionTags.on('ReceiveMessage', message => {
             console.log(message);
           });
         })
         .catch(e => console.log('Connection failed: ', e));
     }
-  }, [connection]);
+    if (connectionAlarms) {
+      connectionAlarms.start()
+        .then(result => {
+          console.log('Connected to Alarms!');
+
+          connectionAlarms.on('ReceiveMessage', message => {
+            console.log(message);
+          });
+        })
+        .catch(e => console.log('Connection failed: ', e));
+    }
+  }, [connectionTags, connectionAlarms]);
 
   function setAvailableAddresses(addresses, userTags, setAddresses) {
     let newAddresses = addresses.map(o => o['address'])
