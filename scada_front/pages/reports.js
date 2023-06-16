@@ -37,12 +37,12 @@ function SideMenu({ selectedReport, setSelectedReport }) {
 }
 
 function AllAlarmsReport() {
-    const [from, setFrom] = useState(new Date().toJSON().slice(0, 10))
-    const [to, setTo] = useState(new Date().toJSON().slice(0, 10))
+    const [fromDate, setFrom] = useState(new Date().toJSON().slice(0, 10))
+    const [toDate, setTo] = useState(new Date().toJSON().slice(0, 10))
     const [alarms, setAlarms] = useState([])
 
     function getAlarms() {
-        axios.get(`${baseUrl}`).then(response => sortAlarms(response.data)).catch(err => console.log(err, " error get all alarm reports"))
+        axios.get(`${baseUrl}/Reports/allAlarmsByDate`, { params: { 'from': fromDate, 'to': toDate } }).then(response => sortAlarms(response.data)).catch(err => console.log(err, " error get all alarm reports"))
     }
 
     function sortAlarms(data) {
@@ -77,8 +77,8 @@ function AllAlarmsReport() {
 
     return <div className={styles.report}>
         <div className={styles.dates}>
-            <input type="date" placeholder="from" value={from} onChange={e => setFrom(e.target.value)} />
-            <input type="date" placeholder="from" value={to} onChange={e => setTo(e.target.value)} />
+            <input type="date" placeholder="from" value={fromDate} onChange={e => setFrom(e.target.value.toString())} />
+            <input type="date" placeholder="from" value={toDate} onChange={e => setTo(e.target.value.toString())} />
             <button className={styles.getBtn} onClick={getAlarms}>Get</button>
         </div>
         <table className={styles.main_table}>
@@ -105,7 +105,7 @@ function PriorityAlarmsReport() {
     const [priority, setPriority] = useState('1')
     const [alarms, setAlarms] = useState([])
     function getAlarms() {
-        axios.get(`${baseUrl}`).then(response => sortAlarms(response.data)).catch(err => console.log(err, " error get priority alarm reports"))
+        axios.get(`${baseUrl}/Reports/allAlarmsByPriority`, { params: { 'priority': priority } }).then(response => sortAlarms(response.data)).catch(err => console.log(err, " error get priority alarm reports"))
     }
 
     function sortAlarms(data) {
@@ -156,16 +156,17 @@ function PriorityAlarmsReport() {
 
 function AlarmRecord({ alarm }) {
     return <tr>
-        <td>id</td>
-        <td>a</td>
-        <td>a</td>
-        <td>a</td>
-        <td>a</td>
-        <td>a</td>
-        <td>a</td>
-        <td>a</td>
+        <td>{alarm['id']}</td>
+        <td>{alarm['date'].split('T')[0]}</td>
+        <td>{alarm['value']}</td>
+        <td>{alarm['priority']}</td>
+        <td>{alarm['tagId']}</td>
+        <td>{alarm['direction']}</td>
+        <td>{alarm['address']}</td>
+        <td>{alarm['units']}</td>
     </tr>
 }
+
 
 function AllTagReport() {
     const [from, setFrom] = useState(new Date().toJSON().slice(0, 10))
@@ -173,7 +174,7 @@ function AllTagReport() {
     const [tags, setTags] = useState([])
 
     function getTags() {
-        axios.get(`${baseUrl}`).then(response => sortTags(response.data)).catch(err => console.log(err, " error get all tags reports"))
+        axios.get(`${baseUrl}/Reports/allHistoryValues`, { params: { 'from': from, 'to': to } }).then(response => sortTags(response.data)).catch(err => console.log(err, " error get all tags reports"))
     }
 
     function sortTags(data) {
@@ -195,25 +196,21 @@ function AllTagReport() {
 
     return <div className={styles.report}>
         <div className={styles.dates}>
-            <input type="date" placeholder="from" value={from} onChange={e => setFrom(e.target.value)} />
-            <input type="date" placeholder="from" value={to} onChange={e => setTo(e.target.value)} />
+            <input type="date" placeholder="from" value={from} onChange={e => setFrom(e.target.value.toString())} />
+            <input type="date" placeholder="to" value={to} onChange={e => setTo(e.target.value.toString())} />
             <button className={styles.getBtn} onClick={getTags}>Get</button>
         </div>
         <table className={styles.main_table}>
             <thead>
                 <tr>
                     <th>Id</th>
-                    <th>Date</th>
-                    <th>Direction</th>
-                    <th>Value</th>
-                    <th>Priority</th>
-                    <th>Tag id</th>
                     <th>IO Address</th>
-                    <th>Units</th>
+                    <th>Value</th>
+                    <th>Date</th>
                 </tr>
             </thead>
             <tbody>
-                {tags.map(tag => <TagRecord key={tag['id']} tag={tag} />)}
+                {tags.map(tag => <AllTagRecord key={tag['id']} tag={tag} />)}
             </tbody>
         </table>
     </div>
@@ -227,42 +224,45 @@ function AnalogTagReport() {
     }, [])
 
     function getTags() {
-        axios.get(`${baseUrl}`).then(response => sortTags(response.data)).catch(err => console.log(err, " error get analog tags reports"))
+        axios.get(`${baseUrl}/Reports/allAnalogValues`).then(response => sortTags(response.data)).catch(err => console.log(err, " error get analog tags reports"))
     }
 
     function sortTags(data) {
-        data.sort((tag1, tag2) => {
-            let time1 = tag1['date'].toLowerCase(),
-                time2 = tag2['date'].toLowerCase();
+        if (data.length > 0) {
+            data.sort((tag1, tag2) => {
+                let time1 = tag1['scanTime'],
+                    time2 = tag2['date'];
 
-            if (time1 < time2) {
-                return -1;
-            }
-            if (time1 > time2) {
-                return 1;
-            }
-            return 0;
-        });
+                if (time1 < time2) {
+                    return -1;
+                }
+                if (time1 > time2) {
+                    return 1;
+                }
+                return 0;
+            });
 
-        setTags(data)
+            setTags(data)
+        }
+
     }
 
     return <div className={styles.report}>
         <table className={styles.main_table}>
             <thead>
                 <tr>
-                    <th>Id</th>
-                    <th>Date</th>
-                    <th>Direction</th>
+                    <th>Address</th>
                     <th>Value</th>
-                    <th>Priority</th>
-                    <th>Tag id</th>
-                    <th>IO Address</th>
+                    <th>Low limit</th>
+                    <th>High limit</th>
                     <th>Units</th>
+                    <th>Scan time</th>
+                    <th>RTU id</th>
+                    <th>Name</th>
                 </tr>
             </thead>
             <tbody>
-                {tags.map(tag => <TagRecord key={tag['id']} tag={tag} />)}
+                {tags.map(tag => <AnalogTagRecord key={tag['address']} tag={tag} />)}
             </tbody>
         </table>
     </div>
@@ -276,49 +276,48 @@ function DigitalTagReport() {
     }, [])
 
     function getTags() {
-        axios.get(`${baseUrl}`).then(response => sortTags(response.data)).catch(err => console.log(err, " error get analog tags reports"))
+        axios.get(`${baseUrl}/Reports/allDigitalValues`).then(response => sortTags(response.data)).catch(err => console.log(err, " error get analog tags reports"))
     }
 
     function sortTags(data) {
-        data.sort((tag1, tag2) => {
-            let time1 = tag1['date'].toLowerCase(),
-                time2 = tag2['date'].toLowerCase();
+        if (data.length > 0) {
+            data.sort((tag1, tag2) => {
+                let time1 = tag1['scanTime'],
+                    time2 = tag2['scanTime'];
 
-            if (time1 < time2) {
-                return -1;
-            }
-            if (time1 > time2) {
-                return 1;
-            }
-            return 0;
-        });
+                if (time1 < time2) {
+                    return -1;
+                }
+                if (time1 > time2) {
+                    return 1;
+                }
+                return 0;
+            });
 
-        setTags(data)
+            setTags(data)
+        }
     }
 
     return <div className={styles.report}>
         <table className={styles.main_table}>
             <thead>
                 <tr>
-                    <th>Id</th>
-                    <th>Date</th>
-                    <th>Direction</th>
-                    <th>Value</th>
-                    <th>Priority</th>
-                    <th>Tag id</th>
                     <th>IO Address</th>
-                    <th>Units</th>
+                    <th>Value</th>
+                    <th>Scan time</th>
+                    <th>RTU id</th>
+                    <th>Name</th>
                 </tr>
             </thead>
             <tbody>
-                {tags.map(tag => <TagRecord key={tag['id']} tag={tag} />)}
+                {tags.map(tag => <DigitalTagRecord key={tag['address']} tag={tag} />)}
             </tbody>
         </table>
     </div>
 }
 
 function SpecificTagReport() {
-    const [tagId, setTagId] = useState(null)
+    const [tagId, setTagId] = useState(-1)
     const [tags, setTags] = useState([])
     const [tagIds, setTagIds] = useState([])
 
@@ -333,7 +332,9 @@ function SpecificTagReport() {
     }, [])
 
     function getTags() {
-        axios.get(`${baseUrl}`).then(response => sortTags(response.data)).catch(err => console.log(err, " error get analog tags reports"))
+        if (tagId != -1) {
+            axios.get(`${baseUrl}/Reports/allTagValues`, { params: { 'tagId': tagId } }).then(response => sortTags(response.data)).catch(err => console.log(err, " error get analog tags reports"))
+        }
     }
 
     function sortTags(data) {
@@ -364,20 +365,61 @@ function SpecificTagReport() {
             <thead>
                 <tr>
                     <th>Id</th>
-                    <th>Date</th>
-                    <th>Direction</th>
-                    <th>Value</th>
-                    <th>Priority</th>
                     <th>Tag id</th>
-                    <th>IO Address</th>
+                    <th>Description</th>
+                    <th>Value</th>
                     <th>Units</th>
+                    <th>IO Address</th>
                 </tr>
             </thead>
             <tbody>
-                {tags.map(tag => <TagRecord key={tag['id']} tag={tag} />)}
+                {tags.map(tag => <SpecificTagRecord key={tag['address']} tag={tag} />)}
             </tbody>
         </table>
     </div>
+}
+
+function AllTagRecord({ tag }) {
+    return <tr>
+        <td>{tag['id']}</td>
+        <td>{tag['address']}</td>
+        <td>{tag['value']}</td>
+        <td>{tag['date']}</td>
+    </tr>
+}
+
+function AnalogTagRecord({ tag }) {
+    return <tr>
+        <td>{tag['address']}</td>
+        <td>{tag['value']}</td>
+        <td>{tag['lowLimit']}</td>
+        <td>{tag['highLimit']}</td>
+        <td>{tag['units']}</td>
+        <td>{tag['scanTime']}</td>
+        <td>{tag['rtuId']}</td>
+        <td>{tag['name']}</td>
+    </tr>
+}
+
+function DigitalTagRecord({ tag }) {
+    return <tr>
+        <td>{tag['address']}</td>
+        <td>{tag['value']}</td>
+        <td>{tag['scanTime']}</td>
+        <td>{tag['rtuId']}</td>
+        <td>{tag['name']}</td>
+    </tr>
+}
+
+function SpecificTagRecord({ tag }) {
+    return <tr>
+        <td>{tag['id']}</td>
+        <td>{tag['tagId']}</td>
+        <td>{tag['description']}</td>
+        <td>{tag['value']}</td>
+        <td>{tag['units']}</td>
+        <td>{tag['address']}</td>
+    </tr>
 }
 
 function TagRecord({ tag }) {

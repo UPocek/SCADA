@@ -56,6 +56,7 @@ export default function Home() {
 
           connectionTags.on('ReceiveMessage', message => {
             console.log(message);
+            updateTag(message['tag'], message['value'])
           });
         })
         .catch(e => console.log('Connection failed: ', e));
@@ -76,6 +77,10 @@ export default function Home() {
         .catch(e => console.log('Connection failed: ', e));
     }
   }, [connectionTags, connectionAlarms]);
+
+  function updateTag(id, value) {
+    setTags(tags.map(tag => { if (tag['id'] == id) { tag['value'] = value } return tag }))
+  }
 
   function setAvailableAddresses(addresses, userTags, setAddresses) {
     let newAddresses = addresses.map(o => o['address'])
@@ -145,7 +150,7 @@ function AllTags({ tags, availableAnalogAddresses, availableDigitalAddresses, se
 function Tag({ tag, tags, setTags, setUser, user }) {
   const [isOn, setIsOn] = useState(tag['onOffScan']);
   const [addNewAlarm, setAddNewAlarm] = useState(false);
-  const [newValue, setNewValue] = useState(null);
+  const [newValue, setNewValue] = useState(0);
 
   function ChangeScanOnOff(answer) {
     if (tag['alarms']) {
