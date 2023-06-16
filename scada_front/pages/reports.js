@@ -37,12 +37,12 @@ function SideMenu({ selectedReport, setSelectedReport }) {
 }
 
 function AllAlarmsReport() {
-    const [from, setFrom] = useState(new Date().toJSON().slice(0, 10))
-    const [to, setTo] = useState(new Date().toJSON().slice(0, 10))
+    const [fromDate, setFrom] = useState(new Date().toJSON().slice(0, 10))
+    const [toDate, setTo] = useState(new Date().toJSON().slice(0, 10))
     const [alarms, setAlarms] = useState([])
 
     function getAlarms() {
-        axios.get(`${baseUrl}`).then(response => sortAlarms(response.data)).catch(err => console.log(err, " error get all alarm reports"))
+        axios.get(`${baseUrl}/Reports/allAlarmsByDate`, { params: { 'from': fromDate, 'to': toDate } }).then(response => sortAlarms(response.data)).catch(err => console.log(err, " error get all alarm reports"))
     }
 
     function sortAlarms(data) {
@@ -77,8 +77,8 @@ function AllAlarmsReport() {
 
     return <div className={styles.report}>
         <div className={styles.dates}>
-            <input type="date" placeholder="from" value={from} onChange={e => setFrom(e.target.value)} />
-            <input type="date" placeholder="from" value={to} onChange={e => setTo(e.target.value)} />
+            <input type="date" placeholder="from" value={fromDate} onChange={e => setFrom(e.target.value.toString())} />
+            <input type="date" placeholder="from" value={toDate} onChange={e => setTo(e.target.value.toString())} />
             <button className={styles.getBtn} onClick={getAlarms}>Get</button>
         </div>
         <table className={styles.main_table}>
