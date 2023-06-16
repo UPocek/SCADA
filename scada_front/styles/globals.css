@@ -34,6 +34,18 @@ body {
   color: white;
 }
 
+.alarm1 {
+  border: 1px solid #0078ff;
+}
+
+.alarm2 {
+  border: 1px solid #ffd200;
+}
+
+.alarm3 {
+  border: 1px solid #ff0000;
+}
+
 /* Header */
 @media (max-width:1069px) {
 

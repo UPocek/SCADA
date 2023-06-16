@@ -147,13 +147,13 @@ namespace scada_back.Services
             {
                 if (alarm.Direction == "notify_if_greater" && tag.Value > alarm.Value)
                 {
-                    SendAlarmMessage(new AlarmMessageDTO(user.Id, $"{tag.Address} - {analogInput.Description} has exceeded {alarm.Value}{tag.Units}", alarm.Priority));
+                    SendAlarmMessage(new AlarmMessageDTO(user.Id, tag.Address, $"{analogInput.Description} has exceeded {alarm.Value}{tag.Units}", alarm.Priority));
                     WriteLog($"{tag.Address} - {analogInput.Description} has exceeded {alarm.Value}{tag.Units}");
                     SaveAlarm(tag, alarm, analogInput);
                 }
                 else if (alarm.Direction == "notify_if_lower" && tag.Value < alarm.Value)
                 {
-                    SendAlarmMessage(new AlarmMessageDTO(user.Id, $"{tag.Address} - {analogInput.Description} is below {alarm.Value}{tag.Units}", alarm.Priority));
+                    SendAlarmMessage(new AlarmMessageDTO(user.Id, tag.Address, $"{analogInput.Description} is below {alarm.Value}{tag.Units}", alarm.Priority));
                     WriteLog($"{tag.Address} - {analogInput.Description} is below {alarm.Value}{tag.Units}");
                     SaveAlarm(tag, alarm, analogInput);
                 }

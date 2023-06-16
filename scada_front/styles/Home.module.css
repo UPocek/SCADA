@@ -12,21 +12,18 @@
 }
 
 .alarm {
-  background-color: aliceblue;
-  background: rgba(255, 0, 0, 0.3);
-  border: 2px solid red;
-  border-radius: 6px;
-  padding: 1rem;
-  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: row;
+}
+
+.alarmContent {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .alarm>p {
   margin-left: 1.5rem;
-}
-
-.alarmTitleDiv {
-  display: flex;
-  justify-content: space-around;
 }
 
 .tags {

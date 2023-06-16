@@ -12,10 +12,11 @@ export default function Home() {
   const router = useRouter();
   const [connectionTags, setConnectionTags] = useState(null);
   const [connectionAlarms, setConnectionAlarms] = useState(null);
-  const [user, setUser] = useState({})
-  const [tags, setTags] = useState([])
-  const [availableAnalogAddresses, setAvailableAnalogAddresses] = useState([])
-  const [availableDigitalAddresses, setAvailableDigitalAddresses] = useState([])
+  const [user, setUser] = useState({});
+  const [tags, setTags] = useState([]);
+  const [availableAnalogAddresses, setAvailableAnalogAddresses] = useState([]);
+  const [availableDigitalAddresses, setAvailableDigitalAddresses] = useState([]);
+  const [activeAlarms, setActiveAlarms] = useState([]);
 
   useEffect(() => {
     let user = getUser()
@@ -65,7 +66,11 @@ export default function Home() {
           console.log('Connected to Alarms!');
 
           connectionAlarms.on('ReceiveMessage', message => {
-            console.log(message);
+            if (message['user'] == getUserId() && activeAlarms.filter(alarm => alarm['address'] == message['address']).length == 0) {
+              let alarms = [...activeAlarms];
+              alarms.push(message);
+              setActiveAlarms(alarms);
+            }
           });
         })
         .catch(e => console.log('Connection failed: ', e));
@@ -88,12 +93,12 @@ export default function Home() {
   return (
     <>
       <NavBar />
-      <AllTags tags={tags} availableAnalogAddresses={availableAnalogAddresses} availableDigitalAddresses={availableDigitalAddresses} setTags={setTags} setAvailableAnalogAddresses={setAvailableAnalogAddresses} setAvailableDigitalAddresses={setAvailableDigitalAddresses} setUser={setUser} user={user} />
+      <AllTags tags={tags} availableAnalogAddresses={availableAnalogAddresses} availableDigitalAddresses={availableDigitalAddresses} setTags={setTags} setAvailableAnalogAddresses={setAvailableAnalogAddresses} setAvailableDigitalAddresses={setAvailableDigitalAddresses} setUser={setUser} user={user} activeAlarms={activeAlarms} setActiveAlarms={setActiveAlarms} />
     </>
   )
 }
 
-function AllTags({ tags, availableAnalogAddresses, availableDigitalAddresses, setAvailableAnalogAddresses, setAvailableDigitalAddresses, setTags, setUser, user }) {
+function AllTags({ tags, availableAnalogAddresses, availableDigitalAddresses, setAvailableAnalogAddresses, setAvailableDigitalAddresses, setTags, setUser, user, activeAlarms, setActiveAlarms }) {
   const [addDigitalTag, setAddDigitalTag] = useState(false)
   const [addAnalogTag, setAddAnalogTag] = useState(false)
 
@@ -131,12 +136,9 @@ function AllTags({ tags, availableAnalogAddresses, availableDigitalAddresses, se
         {addDigitalTag && <NewDigitalTag availableAddresses={availableDigitalAddresses} setAddDigitalTag={setAddDigitalTag} setAvailableAddresses={setAvailableDigitalAddresses} tags={tags} setTags={setTags} />}
       </div>
       <div className={styles.alarms}>
-        <Alarm />
-        <Alarm />
-        <Alarm />
+        {activeAlarms.map(alarm => <Alarm key={alarm['address']} alarm={alarm} activeAlarms={activeAlarms} setActiveAlarms={setActiveAlarms} />)}
       </div>
     </div>
-
   );
 }
 
@@ -376,15 +378,25 @@ function NewAlarm({ tag, addNewAlarm, setAddNewAlarm }) {
   </tr>
 }
 
-function Alarm() {
-  return <div className={styles.alarm}>
-    <div className={styles.alarmTitleDiv}>
-      <h2>Alarm name</h2>
-      <div>
-        <Image alt='add tag' src='/images/alarm.png' width={32} height={32} />
-      </div>
+function Alarm({ alarm, activeAlarms, setActiveAlarms }) {
+
+  function discardAlarm() {
+    let newAlarms = [...activeAlarms];
+    newAlarms = newAlarms.filter(item => item['address'] != alarm['address']);
+    setActiveAlarms(newAlarms);
+  }
+
+  return <div className={`${styles.alarm} alarm${alarm['priority']}`}>
+    <div>
+      <Image src={`/images/alarm${alarm['priority']}`} width={30} height={30} alt={`Alarm ${alarm['priority']}`} />
     </div>
-    <p>Alarm description</p>
+    <div className={styles.alarmContent}>
+      <h2>{alarm}</h2>
+      <p>{alarm['priority'] == '1' ? 'Important' : alarm['priority'] == '2' ? 'Urgent' : 'Critical'}</p>
+    </div>
+    <div>
+      <Image src={`/images/x-mark`} width={30} height={30} alt='X' onClick={discardAlarm} />
+    </div>
   </div>
 }
 
