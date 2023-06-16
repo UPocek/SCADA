@@ -10,14 +10,15 @@ import { useRouter } from 'next/router'
 
 export default function Home() {
   const router = useRouter();
-  const [connection, setConnection] = useState(null);
+  const [connectionTags, setConnectionTags] = useState(null);
+  const [connectionAlarms, setConnectionAlarms] = useState(null);
   const [user, setUser] = useState({})
   const [tags, setTags] = useState([])
   const [availableAnalogAddresses, setAvailableAnalogAddresses] = useState([])
   const [availableDigitalAddresses, setAvailableDigitalAddresses] = useState([])
 
   useEffect(() => {
-    let user = JSON.parse(getUser())
+    let user = getUser()
     if (user != undefined) {
       setUser(user)
       let userTags = []
@@ -33,27 +34,43 @@ export default function Home() {
 
   useEffect(() => {
     localStorage.getItem('user') == null && router.replace('/login');
-    const newConnection = new HubConnectionBuilder()
+    const newConnectionTags = new HubConnectionBuilder()
       .withUrl('https://localhost:7214/hubs/tags')
       .withAutomaticReconnect()
       .build();
+    const newConnectionAlarms = new HubConnectionBuilder()
+      .withUrl('https://localhost:7214/hubs/alarms')
+      .withAutomaticReconnect()
+      .build();
 
-    setConnection(newConnection);
+    setConnectionTags(newConnectionTags);
+    setConnectionAlarms(newConnectionAlarms);
   }, []);
 
   useEffect(() => {
-    if (connection) {
-      connection.start()
+    if (connectionTags) {
+      connectionTags.start()
         .then(result => {
-          console.log('Connected!');
+          console.log('Connected to Tags!');
 
-          connection.on('ReceiveMessage', message => {
+          connectionTags.on('ReceiveMessage', message => {
             console.log(message);
           });
         })
         .catch(e => console.log('Connection failed: ', e));
     }
-  }, [connection]);
+    if (connectionAlarms) {
+      connectionAlarms.start()
+        .then(result => {
+          console.log('Connected to Alarms!');
+
+          connectionAlarms.on('ReceiveMessage', message => {
+            console.log(message);
+          });
+        })
+        .catch(e => console.log('Connection failed: ', e));
+    }
+  }, [connectionTags, connectionAlarms]);
 
   function setAvailableAddresses(addresses, userTags, setAddresses) {
     let newAddresses = addresses.map(o => o['address'])
@@ -71,18 +88,29 @@ export default function Home() {
   return (
     <>
       <NavBar />
-      <AllTags tags={tags} availableAnalogAddresses={availableAnalogAddresses} availableDigitalAddresses={availableDigitalAddresses} setTags={setTags} setAvailableAnalogAddresses={setAvailableAnalogAddresses} setAvailableDigitalAddresses={setAvailableDigitalAddresses} />
+      <AllTags tags={tags} availableAnalogAddresses={availableAnalogAddresses} availableDigitalAddresses={availableDigitalAddresses} setTags={setTags} setAvailableAnalogAddresses={setAvailableAnalogAddresses} setAvailableDigitalAddresses={setAvailableDigitalAddresses} setUser={setUser} user={user} />
     </>
   )
 }
 
-function AllTags({ tags, availableAnalogAddresses, availableDigitalAddresses, setAvailableAnalogAddresses, setAvailableDigitalAddresses, setTags }) {
+function AllTags({ tags, availableAnalogAddresses, availableDigitalAddresses, setAvailableAnalogAddresses, setAvailableDigitalAddresses, setTags, setUser, user }) {
   const [addDigitalTag, setAddDigitalTag] = useState(false)
   const [addAnalogTag, setAddAnalogTag] = useState(false)
 
   return (
     <div className={styles.container}>
-      <div>
+      <div className={styles.tags}>
+        <div>
+          <div className={styles.addTag} onClick={() => setAddAnalogTag(!addAnalogTag)}>
+            <h3>Add Analog Tag </h3>
+            <Image alt='add tag' src='/images/plus.png' width={24} height={24} />
+          </div>
+
+          <div className={styles.addTag} onClick={() => setAddDigitalTag(!addDigitalTag)}>
+            <h3>Add Digital Tag </h3>
+            <Image alt='add tag' src='/images/plus.png' width={24} height={24} />
+          </div>
+        </div>
         <table className={styles.main_table}>
           <thead>
             <tr>
@@ -95,49 +123,78 @@ function AllTags({ tags, availableAnalogAddresses, availableDigitalAddresses, se
             </tr>
           </thead>
           <tbody>
-            {tags.map(tag => <Tag tag={tag} key={tag['ioAddress']} />)}
+            {tags.map(tag => <Tag tag={tag} key={tag['ioAddress']} tags={tags} setTags={setTags} setUser={setUser} user={user} />)}
           </tbody>
         </table>
 
         {addAnalogTag && <NewAnalogTag availableAddresses={availableAnalogAddresses} setAddAnalogTag={setAddAnalogTag} setAvailableAddresses={setAvailableAnalogAddresses} tags={tags} setTags={setTags} />}
         {addDigitalTag && <NewDigitalTag availableAddresses={availableDigitalAddresses} setAddDigitalTag={setAddDigitalTag} setAvailableAddresses={setAvailableDigitalAddresses} tags={tags} setTags={setTags} />}
-
       </div>
-      <div className={styles.addTag} onClick={() => setAddAnalogTag(true)}>
-        <h3>Add Analog Tag </h3>
-        <Image alt='add tag' src='/images/plus.png' width={24} height={24} />
-      </div>
-
-      <div className={styles.addTag} onClick={() => setAddDigitalTag(true)}>
-        <h3>Add Digital Tag </h3>
-        <Image alt='add tag' src='/images/plus.png' width={24} height={24} />
+      <div className={styles.alarms}>
+        <Alarm />
+        <Alarm />
+        <Alarm />
       </div>
     </div>
 
   );
 }
 
-function Tag({ tag }) {
-  const [isOn, setIsOn] = useState(false);
-  const [newValue, setNewValue] = useState(0);
-  return <tr>
-    <td>{tag['description']}</td>
-    <td>{tag['value']}</td>
-    <td>
-      <input className={styles.inputField} type="text" id="newValue" name="newValue" value={newValue} onChange={e => setNewValue(e.target.value)} />
-    </td>
-    <td><div className={styles.IObtns}>
-      <div className={`${styles.onBtn} ${isOn ? styles.black : ''}`} onClick={() => setIsOn(true)}>On</div>
-      <div className={`${styles.offBtn} ${isOn ? '' : styles.black}`} onClick={() => setIsOn(false)}>Off</div>
-    </div>
-    </td>
-    <td><div className={styles.icon}>
-      <Image alt='remove' src='/images/remove.png' width={24} height={24} />
-    </div></td>
-    <td><div className={styles.icon}>
-      <Image alt='add alarm' src='/images/add.png' width={24} height={24} />
-    </div></td>
-  </tr>
+function Tag({ tag, tags, setTags, setUser, user }) {
+  const [isOn, setIsOn] = useState(tag['onOffScan']);
+  const [addNewAlarm, setAddNewAlarm] = useState(false);
+  const [newValue, setNewValue] = useState(null);
+
+  function ChangeScanOnOff(answer) {
+    if (tag['alarms']) {
+      axios.put(`${baseUrl}/User/${getUserId()}/scanOnOff/analog/${tag['ioAddress']}`, null, { params: { answer: answer } }).then(_ => setIsOn(answer)).catch(err => console.log("Error on onOffScanAnalog"))
+    } else {
+      axios.put(`${baseUrl}/User/${getUserId()}/scanOnOff/digital/${tag['ioAddress']}`, null, { params: { answer: answer } }).then(_ => setIsOn(answer)).catch(err => console.log("Error on onOffScanDigital"))
+    }
+  }
+
+  function deleteTag() {
+    if (tag['alarms']) {
+      axios.put(`${baseUrl}/User/${getUserId()}/delete/analog/${tag['ioAddress']}`, null).then(_ => removeTagFromTags()).catch(err => console.log("Error delete analog tag ", err))
+    } else {
+      axios.put(`${baseUrl}/User/${getUserId()}/delete/digital/${tag['ioAddress']}`, null).then(_ => removeTagFromTags()).catch(err => console.log("Error delete digital tag ", err))
+    }
+  }
+
+  function removeTagFromTags() {
+    const newUser = JSON.parse(JSON.stringify(user))
+    if (tag['alarms']) {
+      newUser['analogInputs'] = newUser['analogInputs'].filter(t => t['ioAddress'] != tag['ioAddress'])
+    } else {
+      newUser['digitalInputs'] = newUser['digitalInputs'].filter(t => t['ioAddress'] != tag['ioAddress'])
+    }
+    setUser(newUser)
+    const newTags = [...tags].filter(t => t['ioAddress'] != tag['ioAddress'])
+    setTags(newTags)
+  }
+
+  return <>
+    <tr>
+      <td>{tag['description']}</td>
+      <td>{tag['value']}</td>
+      <td>
+        <input className={styles.inputField} type="text" id="newValue" name="newValue" value={newValue} onChange={e => setNewValue(e.target.value)} />
+      </td>
+      <td><div className={styles.IObtns}>
+        <div className={`${styles.onBtn} ${isOn ? styles.black : ''}`} onClick={() => ChangeScanOnOff(true)}>On</div>
+        <div className={`${styles.offBtn} ${isOn ? '' : styles.black}`} onClick={() => ChangeScanOnOff(false)}>Off</div>
+      </div>
+      </td>
+      <td><div className={styles.icon} onClick={deleteTag}>
+        <Image alt='remove' src='/images/remove.png' width={24} height={24} />
+      </div></td>
+      {tag['alarms'] && <td><div className={styles.icon} onClick={() => setAddNewAlarm(!addNewAlarm)}>
+        <Image alt='add alarm' src='/images/add.png' width={24} height={24} />
+      </div></td>}
+    </tr>
+    {(addNewAlarm && tag['alarms']) && <NewAlarm tag={tag} setAddNewAlarm={setAddNewAlarm} addNewAlarm={addNewAlarm} />}
+  </>
+
 }
 
 function NewAnalogTag({ availableAddresses, setAddAnalogTag, setAvailableAddresses, tags, setTags }) {
@@ -149,6 +206,10 @@ function NewAnalogTag({ availableAddresses, setAddAnalogTag, setAvailableAddress
 
 
   function AddNewAnalogTag() {
+    if (name == '' || ioAddress == '' || scanTime == 0 || lowLimit > highLimit) {
+      alert("Invalid inputs!")
+      return;
+    }
     const newTag = {
       "description": name,
       "ioAddress": ioAddress,
@@ -215,6 +276,10 @@ function NewDigitalTag({ availableAddresses, setAddDigitalTag, setAvailableAddre
 
 
   function AddNewAnalogTag() {
+    if (name == '' || ioAddress == '' || scanTime == 0) {
+      alert("Invalid inputs!")
+      return;
+    }
     const newTag = {
       "description": name,
       "ioAddress": ioAddress,
@@ -261,8 +326,67 @@ function NewDigitalTag({ availableAddresses, setAddDigitalTag, setAvailableAddre
       </tr>
     </tbody>
   </table>
+}
 
+function NewAlarm({ tag, addNewAlarm, setAddNewAlarm }) {
+  const [direction, setDirection] = useState('notify_if_greater');
+  const [alarmValue, setValue] = useState('');
+  const [priority, setPriority] = useState('1');
 
+  function AddNewTagAlarm() {
+    if (alarmValue == null || alarmValue == '' || alarmValue.startsWith('e')) {
+      alert("Invalid inputs!")
+      return;
+    }
+    const alarm = {
+      'direction': direction,
+      'value': +alarmValue,
+      'priority': priority
+    }
+
+    axios.post(`${baseUrl}/User/${getUserId()}/alarm/${tag['ioAddress']}`, alarm).then(_ => { setAddNewAlarm(false); alert("Alarm added successfully.") }).catch(err => console.log("Error on addNewAlarm"))
+
+  }
+
+  return <tr className={styles.addAlarm}>
+    <td>Current value</td>
+    <td>
+      <select className={styles.inputField} name="direction" id="direction" value={direction} onChange={e => setDirection(e.target.value)}>
+        <option value='notify_if_greater'>greater</option>
+        <option value='notify_if_lower'>lower</option>
+      </select>
+    </td>
+    <td>then</td>
+    <td>
+      <input className={styles.inputField} type="number" id="value" name="value" value={alarmValue} onChange={e => setValue(e.target.value)} placeholder='Specific value' />
+    </td>
+    <td>
+      <span>Priority: </span>
+      <select className={styles.inputField} name="priority" id="priority" value={priority} onChange={e => setPriority(e.target.value)}>
+        <option value='1'>LOW</option>
+        <option value='2'>MEDIUM</option>
+        <option value='3'>HIGH</option>
+      </select>
+    </td>
+    <td>
+      <div onClick={AddNewTagAlarm}>
+        <Image alt='add tag' src='/images/plus.png' width={24} height={24} />
+      </div>
+    </td>
+  </tr>
+}
+
+function Alarm() {
+  return <div className={styles.alarm}>
+    <div className={styles.alarmTitleDiv}>
+      <h2>Alarm name</h2>
+      <div>
+        <Image alt='add tag' src='/images/alarm.png' width={32} height={32} />
+      </div>
+    </div>
+    <p>Alarm description</p>
+
+  </div>
 }
 
 // Send message to signalR

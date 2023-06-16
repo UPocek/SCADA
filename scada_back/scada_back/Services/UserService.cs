@@ -63,10 +63,64 @@ namespace scada_back.Services
             return newDigitalInput;
         }
 
+        public async Task ChangeAnalogScanOnOff(string userId, string ioAddress, bool answer)
+        {
+            User user = await _mongo._userCollection.Find(item => item.Id == userId).SingleOrDefaultAsync();
+            var analogInputs = user.AnalogInputs;
+
+            var changedTag = analogInputs.Single(ai => ai.IOAddress == ioAddress);
+            changedTag.OnOffScan = answer;
+            var updateUser = Builders<User>.Update.Set("AnalogInputs", analogInputs);
+            await _mongo._userCollection.UpdateOneAsync(u => u.Id == userId, updateUser);
+        }
+
+        public async Task ChangeDigitalScanOnOff(string userId, string ioAddress, bool answer)
+        {
+            User user = await _mongo._userCollection.Find(item => item.Id == userId).SingleOrDefaultAsync();
+            var digitalInputs = user.DigitalInputs;
+
+            var changedTag = digitalInputs.Single(ai => ai.IOAddress == ioAddress);
+            changedTag.OnOffScan = answer;
+            var updateUser = Builders<User>.Update.Set("DigitalInputs", digitalInputs);
+            await _mongo._userCollection.UpdateOneAsync(u => u.Id == userId, updateUser);
+        }
+
+        public async Task DeleteAnalogTag(string userId, string ioAddress)
+        {
+            User user = await _mongo._userCollection.Find(item => item.Id == userId).SingleOrDefaultAsync();
+            var analogInputs = user.AnalogInputs;
+
+            analogInputs = analogInputs.Where(ai => ai.IOAddress != ioAddress).ToList();
+
+            var updateUser = Builders<User>.Update.Set("AnalogInputs", analogInputs);
+            await _mongo._userCollection.UpdateOneAsync(u => u.Id == userId, updateUser);
+        }
+
+        public async Task DeleteDigitalTag(string userId, string ioAddress)
+        {
+            User user = await _mongo._userCollection.Find(item => item.Id == userId).SingleOrDefaultAsync();
+            var digitalInputs = user.DigitalInputs;
+
+            digitalInputs = digitalInputs.Where(ai => ai.IOAddress != ioAddress).ToList();
+            var updateUser = Builders<User>.Update.Set("DigitalInputs", digitalInputs);
+            await _mongo._userCollection.UpdateOneAsync(u => u.Id == userId, updateUser);
+        }
+
         public async Task DeactivateUser(string userId)
         {
             var update = Builders<User>.Update.Set(user => user.Active, false);
             await _mongo._userCollection.UpdateOneAsync(user => user.Id == userId, update);
+        }
+
+        public async Task AddAlarm(string userId, string ioAddress, AlarmDTO alarm)
+        {
+            User user = await _mongo._userCollection.Find(item => item.Id == userId).SingleOrDefaultAsync();
+            var analogInputs = user.AnalogInputs;
+
+            analogInputs.Where(ai => ai.IOAddress == ioAddress).Single().Alarms.Add(new Alarm(alarm));
+
+            var updateUser = Builders<User>.Update.Set("AnalogInputs", analogInputs);
+            await _mongo._userCollection.UpdateOneAsync(u => u.Id == userId, updateUser);
         }
 
         private static string EncriptPassword(string password)
