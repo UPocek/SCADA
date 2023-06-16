@@ -18,7 +18,7 @@ namespace scada_back.Controllers
         }
 
         // /api/Reports/allAlarmsByDate
-        [HttpPut("allAlarmsByDate")]
+        [HttpGet("allAlarmsByDate")]
         public async Task<List<AlarmInstance>> GetAlarmsByDateReport(DateRangeRequestDTO request)
         {
             return await _reportsService.GetAllAlarmsForSpecificDateRange(request);
