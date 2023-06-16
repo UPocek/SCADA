@@ -12,6 +12,7 @@ builder.Services.Configure<ScadaDatabaseSettings>(
 builder.Services.AddSingleton<MongoDBService>();
 builder.Services.AddSingleton<TagsService>();
 builder.Services.AddSingleton<UserService>();
+builder.Services.AddSingleton<ReportsService>();
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 

@@ -17,11 +17,11 @@ namespace scada_back.Controllers
             _reportsService = reportsService;
         }
 
-        // /api/Reports/allAlarmsByDate
+        // /api/Reports/allAlarmsByDate?from=&to=
         [HttpGet("allAlarmsByDate")]
-        public async Task<List<AlarmInstance>> GetAlarmsByDateReport(DateRangeRequestDTO request)
+        public async Task<List<AlarmInstance>> GetAlarmsByDateReport(string from, string to)
         {
-            return await _reportsService.GetAllAlarmsForSpecificDateRange(request);
+            return await _reportsService.GetAllAlarmsForSpecificDateRange(from, to);
         }
 
         // /api/Reports/allAlarmsByPriority?priority=
@@ -31,11 +31,11 @@ namespace scada_back.Controllers
             return await _reportsService.GetAllAlarmsWithPriority(priority);
         }
 
-        // /api/Reports/allHistoryValues
+        // /api/Reports/allHistoryValues?from=&to=
         [HttpGet("allHistoryValues")]
-        public async Task<List<HistoryInstance>> GetAllTagValuesReport(DateRangeRequestDTO request)
+        public async Task<List<HistoryInstance>> GetAllTagValuesReport(string from, string to)
         {
-            return await _reportsService.GetAllTagValues(request);
+            return await _reportsService.GetAllTagValues(from, to);
         }
 
         // /api/Reports/allAnalogValues

@@ -15,9 +15,9 @@ namespace scada_back.Services
             _mongo = mongoDB;
         }
 
-        public async Task<List<AlarmInstance>> GetAllAlarmsForSpecificDateRange(DateRangeRequestDTO request)
+        public async Task<List<AlarmInstance>> GetAllAlarmsForSpecificDateRange(string from, string to)
         {
-            return await _mongo._alarmCollection.Find(alarm => alarm.Date > DateTime.Parse(request.From) & alarm.Date < DateTime.Parse(request.To)).ToListAsync();
+            return await _mongo._alarmCollection.Find(alarm => alarm.Date > DateTime.Parse(from) & alarm.Date < DateTime.Parse(to)).ToListAsync();
         }
 
         public async Task<List<AlarmInstance>> GetAllAlarmsWithPriority(int priority)
@@ -25,9 +25,9 @@ namespace scada_back.Services
             return await _mongo._alarmCollection.Find(alarm => alarm.Priority == priority).ToListAsync();
         }
 
-        public async Task<List<HistoryInstance>> GetAllTagValues(DateRangeRequestDTO request)
+        public async Task<List<HistoryInstance>> GetAllTagValues(string from, string to)
         {
-            return await _mongo._historyCollection.Find(item => item.Date > DateTime.Parse(request.From) & item.Date < DateTime.Parse(request.To)).ToListAsync();
+            return await _mongo._historyCollection.Find(item => item.Date > DateTime.Parse(from) & item.Date < DateTime.Parse(to)).ToListAsync();
         }
 
         public async Task<List<AddressValueAnalog>> GetAnalogValues()
