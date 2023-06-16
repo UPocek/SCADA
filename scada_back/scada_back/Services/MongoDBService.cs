@@ -10,6 +10,9 @@ namespace scada_back.Services
         public readonly IMongoCollection<AddressValueAnalog> _addressValueAnalogCollection;
         public readonly IMongoCollection<AddressValueDigital> _addressValueDigitalCollection;
         public readonly IMongoCollection<User> _userCollection;
+        public readonly IMongoCollection<AlarmInstance> _alarmCollection;
+        public readonly IMongoCollection<TagValueInstance> _tagvalueCollection;
+        public readonly IMongoCollection<HistoryInstance> _historyCollection;
 
         public MongoDBService(
             IOptions<ScadaDatabaseSettings> databaseSettings)
@@ -26,6 +29,12 @@ namespace scada_back.Services
                 databaseSettings.Value.AddressValueDigitalCollectionName);
             _userCollection = mongoDatabase.GetCollection<User>(
                 databaseSettings.Value.UserCollectionName);
+            _alarmCollection = mongoDatabase.GetCollection<AlarmInstance>(
+                databaseSettings.Value.AlarmCollectionName);
+            _tagvalueCollection = mongoDatabase.GetCollection<TagValueInstance>(
+                databaseSettings.Value.TagValueCollectionName);
+            _historyCollection = mongoDatabase.GetCollection<HistoryInstance>(
+                databaseSettings.Value.HistoryCollectionName);
 
             InitializeDB();
         }
