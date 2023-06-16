@@ -81,14 +81,14 @@ namespace scada_back.Controllers
             return Ok();
         }
 
-        [HttpPut("{userId}/analog/{ioAddress}")]
+        [HttpPut("{userId}/delete/analog/{ioAddress}")]
         public async Task<ActionResult> DeleteAnalogAlarm(string userId, string ioAddress)
         {
             await _userService.DeleteAnalogAlarm(userId, ioAddress);
             return Ok();
         }
 
-        [HttpPut("{userId}/digital/{ioAddress}")]
+        [HttpPut("{userId}/delete/digital/{ioAddress}")]
         public async Task<ActionResult> DeleteDigitalAlarm(string userId, string ioAddress)
         {
             await _userService.DeleteDigitalAlarm(userId, ioAddress);
