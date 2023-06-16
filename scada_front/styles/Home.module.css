@@ -1,17 +1,17 @@
-.container{
+.container {
   margin: auto;
   display: flex;
   align-items: flex-start;
   margin-top: 20vh;
 }
 
-.alarms{
+.alarms {
   margin-top: 10vh;
   width: 18%;
   margin-left: 2rem;
 }
 
-.alarm{
+.alarm {
   background-color: aliceblue;
   background: rgba(255, 0, 0, 0.3);
   border: 2px solid red;
@@ -20,16 +20,16 @@
   margin-bottom: 1rem;
 }
 
-.alarm > p{
+.alarm>p {
   margin-left: 1.5rem;
 }
 
-.alarmTitleDiv{
+.alarmTitleDiv {
   display: flex;
   justify-content: space-around;
 }
 
-.tags{
+.tags {
   width: 70%;
   margin-left: 2rem;
 }
@@ -58,51 +58,51 @@
   padding: 10px;
 }
 
-.IObtns{
+.IObtns {
   margin-left: 1rem;
   display: flex;
   justify-content: center;
 }
 
-.onBtn{
+.onBtn {
   border: 1px solid var(--LightNote);
   border-radius: 8px 0px 0px 8px;
   padding: 0.5rem;
 }
 
-.black{
+.black {
   background-color: black;
   color: aliceblue;
 }
 
-.offBtn{
+.offBtn {
   border: 1px solid var(--LightNote);
   border-radius: 0px 8px 8px 0px;
   padding: 0.5rem;
 }
 
-.icon{
+.icon {
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
 }
 
-.addTag{
+.addTag {
   display: flex;
   align-items: center;
   cursor: pointer;
   margin: 1rem;
 }
 
-.addTag > h3{
+.addTag>h3 {
   margin: 0;
   margin-left: 1rem;
   margin-right: 0.5rem;
 }
 
 .inputField {
-  border: 1px solid var(--Note);
+  border: 2px solid var(--Note);
   border-radius: 6px;
   padding: 0.5rem;
 }
@@ -112,6 +112,6 @@
   border: 2px solid green;
 }
 
-.addAlarm{
+.addAlarm {
   background-color: var(--Note);
 }

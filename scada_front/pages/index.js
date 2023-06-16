@@ -33,18 +33,18 @@ export default function Home() {
   }, [])
 
   useEffect(() => {
-    localStorage.getItem('user') == null && router.replace('/login');
-    const newConnectionTags = new HubConnectionBuilder()
-      .withUrl('https://localhost:7214/hubs/tags')
-      .withAutomaticReconnect()
-      .build();
-    const newConnectionAlarms = new HubConnectionBuilder()
-      .withUrl('https://localhost:7214/hubs/alarms')
-      .withAutomaticReconnect()
-      .build();
+    // localStorage.getItem('user') == null && router.replace('/login');
+    // const newConnectionTags = new HubConnectionBuilder()
+    //   .withUrl('https://localhost:7214/hubs/tags')
+    //   .withAutomaticReconnect()
+    //   .build();
+    // const newConnectionAlarms = new HubConnectionBuilder()
+    //   .withUrl('https://localhost:7214/hubs/alarms')
+    //   .withAutomaticReconnect()
+    //   .build();
 
-    setConnectionTags(newConnectionTags);
-    setConnectionAlarms(newConnectionAlarms);
+    // setConnectionTags(newConnectionTags);
+    // setConnectionAlarms(newConnectionAlarms);
   }, []);
 
   useEffect(() => {
@@ -324,16 +324,16 @@ function NewAlarm({ tag, addNewAlarm, setAddNewAlarm }) {
       'priority': priority
     }
 
-    axios.put(`${baseUrl}/User/${getUserId()}/analog/${tag['ioAddress']}`, alarm,).then(_ => setAddNewAlarm(!addNewAlarm)).catch(err => console.log("Error on addNewAlarm"))
+    axios.put(`${baseUrl}/User/${getUserId()}/analog/${tag['ioAddress']}`, alarm).then(_ => setAddNewAlarm(false)).catch(err => console.log("Error on addNewAlarm"))
 
   }
 
   return <tr className={styles.addAlarm}>
     <td>Current value</td>
     <td>
-      <select name="direction" id="direction" value={direction} onChange={e => setDirection(e.target.value)}>
-        <option value='notify_if_greater'>{'>'}</option>
-        <option value='notify_if_lower'>{'<'}</option>
+      <select className={styles.inputField} name="direction" id="direction" value={direction} onChange={e => setDirection(e.target.value)}>
+        <option value='notify_if_greater'>greater</option>
+        <option value='notify_if_lower'>lower</option>
       </select>
     </td>
     <td>then</td>
@@ -341,10 +341,11 @@ function NewAlarm({ tag, addNewAlarm, setAddNewAlarm }) {
       <input className={styles.inputField} type="number" id="value" name="value" value={value} onChange={e => setValue(e.target.value)} placeholder='Specific value' />
     </td>
     <td>
-      <select name="priority" id="priority" value={priority} onChange={e => setPriority(e.target.value)}>
-        <option value='1'>low</option>
-        <option value='2'>medium</option>
-        <option value='3'>high</option>
+      <span>Priority: </span>
+      <select className={styles.inputField} name="priority" id="priority" value={priority} onChange={e => setPriority(e.target.value)}>
+        <option value='1'>LOW</option>
+        <option value='2'>MEDIUM</option>
+        <option value='3'>HIGH</option>
       </select>
     </td>
     <td>
