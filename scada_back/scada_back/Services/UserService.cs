@@ -101,8 +101,7 @@ namespace scada_back.Services
             User user = await _mongo._userCollection.Find(item => item.Id == userId).SingleOrDefaultAsync();
             var digitalInputs = user.DigitalInputs;
 
-            digitalInputs = digitalInputs.Where(ai => ai.IOAddress == ioAddress).ToList();
-  
+            digitalInputs = digitalInputs.Where(ai => ai.IOAddress != ioAddress).ToList();
             var updateUser = Builders<User>.Update.Set("DigitalInputs", digitalInputs);
             await _mongo._userCollection.UpdateOneAsync(u => u.Id == userId, updateUser);
         }

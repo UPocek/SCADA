@@ -88,12 +88,12 @@ export default function Home() {
   return (
     <>
       <NavBar />
-      <AllTags tags={tags} availableAnalogAddresses={availableAnalogAddresses} availableDigitalAddresses={availableDigitalAddresses} setTags={setTags} setAvailableAnalogAddresses={setAvailableAnalogAddresses} setAvailableDigitalAddresses={setAvailableDigitalAddresses} />
+      <AllTags tags={tags} availableAnalogAddresses={availableAnalogAddresses} availableDigitalAddresses={availableDigitalAddresses} setTags={setTags} setAvailableAnalogAddresses={setAvailableAnalogAddresses} setAvailableDigitalAddresses={setAvailableDigitalAddresses} setUser={setUser} user={user} />
     </>
   )
 }
 
-function AllTags({ tags, availableAnalogAddresses, availableDigitalAddresses, setAvailableAnalogAddresses, setAvailableDigitalAddresses, setTags }) {
+function AllTags({ tags, availableAnalogAddresses, availableDigitalAddresses, setAvailableAnalogAddresses, setAvailableDigitalAddresses, setTags, setUser, user }) {
   const [addDigitalTag, setAddDigitalTag] = useState(false)
   const [addAnalogTag, setAddAnalogTag] = useState(false)
 
@@ -123,7 +123,7 @@ function AllTags({ tags, availableAnalogAddresses, availableDigitalAddresses, se
             </tr>
           </thead>
           <tbody>
-            {tags.map(tag => <Tag tag={tag} key={tag['ioAddress']} />)}
+            {tags.map(tag => <Tag tag={tag} key={tag['ioAddress']} tags={tags} setTags={setTags} setUser={setUser} user={user} />)}
           </tbody>
         </table>
 
@@ -140,7 +140,7 @@ function AllTags({ tags, availableAnalogAddresses, availableDigitalAddresses, se
   );
 }
 
-function Tag({ tag }) {
+function Tag({ tag, tags, setTags, setUser, user }) {
   const [isOn, setIsOn] = useState(tag['onOffScan']);
   const [addNewAlarm, setAddNewAlarm] = useState(false);
   const [newValue, setNewValue] = useState(null);
@@ -151,6 +151,26 @@ function Tag({ tag }) {
     } else {
       axios.put(`${baseUrl}/User/${getUserId()}/scanOnOff/digital/${tag['ioAddress']}`, null, { params: { answer: answer } }).then(_ => setIsOn(answer)).catch(err => console.log("Error on onOffScanDigital"))
     }
+  }
+
+  function deleteTag() {
+    if (tag['alarms']) {
+      axios.put(`${baseUrl}/User/${getUserId()}/delete/analog/${tag['ioAddress']}`, null).then(_ => removeTagFromTags()).catch(err => console.log("Error delete analog tag ", err))
+    } else {
+      axios.put(`${baseUrl}/User/${getUserId()}/delete/digital/${tag['ioAddress']}`, null).then(_ => removeTagFromTags()).catch(err => console.log("Error delete digital tag ", err))
+    }
+  }
+
+  function removeTagFromTags() {
+    const newUser = JSON.parse(JSON.stringify(user))
+    if (tag['alarms']) {
+      newUser['analogInputs'] = newUser['analogInputs'].filter(t => t['ioAddress'] != tag['ioAddress'])
+    } else {
+      newUser['digitalInputs'] = newUser['digitalInputs'].filter(t => t['ioAddress'] != tag['ioAddress'])
+    }
+    setUser(newUser)
+    const newTags = [...tags].filter(t => t['ioAddress'] != tag['ioAddress'])
+    setTags(newTags)
   }
 
   return <>
@@ -165,7 +185,7 @@ function Tag({ tag }) {
         <div className={`${styles.offBtn} ${isOn ? '' : styles.black}`} onClick={() => ChangeScanOnOff(false)}>Off</div>
       </div>
       </td>
-      <td><div className={styles.icon}>
+      <td><div className={styles.icon} onClick={deleteTag}>
         <Image alt='remove' src='/images/remove.png' width={24} height={24} />
       </div></td>
       {tag['alarms'] && <td><div className={styles.icon} onClick={() => setAddNewAlarm(!addNewAlarm)}>
