@@ -1,9 +1,37 @@
 .container{
   margin: auto;
   display: flex;
-  justify-content: center;
   align-items: flex-start;
   margin-top: 20vh;
+}
+
+.alarms{
+  margin-top: 10vh;
+  width: 18%;
+  margin-left: 2rem;
+}
+
+.alarm{
+  background-color: aliceblue;
+  background: rgba(255, 0, 0, 0.3);
+  border: 2px solid red;
+  border-radius: 6px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.alarm > p{
+  margin-left: 1.5rem;
+}
+
+.alarmTitleDiv{
+  display: flex;
+  justify-content: space-around;
+}
+
+.tags{
+  width: 70%;
+  margin-left: 2rem;
 }
 
 .main_table {
@@ -20,10 +48,6 @@
 .main_table tr {
   cursor: pointer;
   transition: all 150ms;
-}
-
-.main_table tbody tr:hover {
-  background-color: var(--DarkGrayHover);
 }
 
 .main_table th {
@@ -86,4 +110,8 @@
 .inputField:focus {
   outline: none !important;
   border: 2px solid green;
+}
+
+.addAlarm{
+  background-color: var(--Note);
 }

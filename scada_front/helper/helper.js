@@ -1,7 +1,7 @@
 export function getUser() {
-    return localStorage.getItem('user')
+    return JSON.parse(localStorage.getItem('user'))
 }
 
 export function getUserId() {
-    return localStorage.getItem('user')['id']
+    return JSON.parse(localStorage.getItem('user'))['id']
 }
