@@ -28,11 +28,54 @@
 }
 
 .report{
-    margin-left: 2rem;
     width: 60%;
-    background: rgba(255, 255, 255, 0.8);
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-    border: 1px solid var(--LightNote);
+    margin-left: 2rem;
+}
+
+.report input, .report select, .report option{
+    border: 2px solid var(--Note);
+    border-radius: 6px;
+    padding: 0.5rem;
+    margin-right: 1rem;
+}
+
+.dates{
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.main_table {
+    width: 100%;
+    border: 1px solid transparent;
+    text-align: center;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
     border-radius: 8px;
-    padding: 1rem;
+    font-size: 0.9rem !important;
+    background: rgba(255, 255, 255, 0.8);
+    margin-bottom: 1rem;
+  }
+  
+  .main_table tr {
+    cursor: pointer;
+    transition: all 150ms;
+  }
+  
+  .main_table th {
+    padding: 20px 15px;
+  }
+  
+  .main_table td {
+    padding: 10px;
+  }
+
+  .getBtn {
+    font-weight: 500;
+    text-decoration: none;
+    background-color: #000;
+    border-radius: 8px;
+    color: #fff;
+    padding: 0 0.75rem;
+    border: 1px solid #000;
+    cursor: pointer;
 }
