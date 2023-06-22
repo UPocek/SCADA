@@ -49,13 +49,6 @@ export default function Home() {
       connectionAlarms.start()
         .then(result => {
           console.log('Connected to Alarms!');
-          connectionAlarms.on('ReceiveMessage', message => {
-            if (message['user'] == getUserId() && activeAlarms.filter(alarm => alarm['message'] == message['message']).length == 0) {
-              let alarmsNew = [...activeAlarms];
-              alarmsNew.push(message);
-              setActiveAlarms(alarmsNew);
-            }
-          });
         })
         .catch(e => console.log('Connection failed: ', e));
     }
@@ -70,6 +63,22 @@ export default function Home() {
   }, [connectionTags, connectionAlarms]);
 
   useEffect(() => {
+    if (connectionAlarms) {
+      connectionAlarms.on('ReceiveMessage', message => {
+        console.log(message);
+        if (message['user'] == getUserId() && activeAlarms.filter(alarm => alarm['message'] == message['message']).length == 0) {
+          let alarmsNew = [...activeAlarms];
+          alarmsNew.push(message);
+          setActiveAlarms(alarmsNew);
+        }
+      });
+      return () => {
+        connectionAlarms.off('ReceiveMessage');
+      }
+    }
+  }, [connectionAlarms, activeAlarms])
+
+  useEffect(() => {
     if (connectionTags && tags.length > 0) {
       connectionTags.on('ReceiveMessage', message => {
         updateTag(message['tag'], message['value'], tags)
@@ -78,7 +87,7 @@ export default function Home() {
         connectionTags.off('ReceiveMessage');
       }
     }
-  }, [tags])
+  }, [connectionTags, tags])
 
   function updateUserInfo(data) {
     let userTags = [];
@@ -113,7 +122,6 @@ export default function Home() {
 function AllTags({ isAdmin, tags, availableAnalogAddresses, availableDigitalAddresses, setAvailableAnalogAddresses, setAvailableDigitalAddresses, setTags, setUser, user, activeAlarms, setActiveAlarms, controls, setControls }) {
   const [addDigitalTag, setAddDigitalTag] = useState(false)
   const [addAnalogTag, setAddAnalogTag] = useState(false)
-  console.log(isAdmin)
   return (
     <div className={styles.container}>
       <div className={styles.tags}>

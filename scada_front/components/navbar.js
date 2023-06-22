@@ -1,12 +1,20 @@
 import Link from 'next/link';
 import navStyle from '../styles/Navbar.module.css'
 import Image from 'next/image';
-
 import Router from 'next/router';
 import axios from 'axios';
 import { baseUrl } from '@/pages/_app';
+import { useEffect, useState } from 'react';
+import { getIsAdmin } from '@/helper/helper';
 
 export default function NavBar() {
+    const [role, setRole] = useState(false);
+
+    useEffect(() => {
+        setRole(getIsAdmin());
+    }, [])
+
+
     function logOut() {
         const userString = localStorage.getItem('user');
         userString && notifyServer(JSON.parse(userString)['id']);
@@ -26,8 +34,8 @@ export default function NavBar() {
             </Link>
             <ul className={navStyle.navUl}>
                 <li><Link className={navStyle.navItem} href="/" >Control Panel</Link></li>
-                <li><Link className={navStyle.navItem} href="/reports">Reports</Link></li>
-                <li><Link className={navStyle.navItem} href="/registration">Create account</Link></li>
+                {role && <li><Link className={navStyle.navItem} href="/reports">Reports</Link></li>}
+                {role && <li><Link className={navStyle.navItem} href="/registration">Create account</Link></li>}
             </ul>
             <ul className={navStyle.navUl}>
                 <Link className={navStyle.signOut} href="/" onClick={logOut}>Sign out</Link>
