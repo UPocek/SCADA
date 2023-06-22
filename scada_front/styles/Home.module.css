@@ -1,0 +1,123 @@
+.container {
+  margin: auto;
+  display: flex;
+  align-items: flex-start;
+  margin-top: 20vh;
+}
+
+.alarms {
+  margin-top: 10vh;
+  width: 18%;
+  margin-left: 2rem;
+}
+
+.alarm {
+  padding: 20px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.alarmContent {
+  display: flex;
+  flex-direction: column;
+}
+
+.alarmContent>p,
+.alarmContent h3 {
+  margin: 0;
+}
+
+.tags {
+  width: 70%;
+  margin-left: 2rem;
+}
+
+.main_table {
+  width: 100%;
+  border: 1px solid transparent;
+  text-align: center;
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+  border-radius: 8px;
+  font-size: 0.9rem !important;
+  background: rgba(255, 255, 255, 0.8);
+  margin-bottom: 1rem;
+}
+
+.main_table tr {
+  cursor: pointer;
+  transition: all 150ms;
+}
+
+.main_table th {
+  padding: 20px 15px;
+}
+
+.main_table td {
+  padding: 10px;
+}
+
+.IObtns {
+  margin-left: 1rem;
+  display: flex;
+  justify-content: center;
+}
+
+.onBtn {
+  border: 1px solid var(--LightNote);
+  border-radius: 8px 0px 0px 8px;
+  padding: 0.5rem;
+}
+
+.black {
+  background-color: black;
+  color: aliceblue;
+}
+
+.offBtn {
+  border: 1px solid var(--LightNote);
+  border-radius: 0px 8px 8px 0px;
+  padding: 0.5rem;
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.addTag {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  margin: 1rem;
+}
+
+.addTag>h3 {
+  margin: 0;
+  margin-left: 1rem;
+  margin-right: 0.5rem;
+}
+
+.inputField {
+  border: 2px solid var(--Note);
+  border-radius: 6px;
+  padding: 0.5rem;
+}
+
+.inputField:focus {
+  outline: none !important;
+  border: 2px solid green;
+}
+
+.addAlarm {
+  background-color: var(--Note);
+}
+
+.cross {
+  cursor: pointer;
+}

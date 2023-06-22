@@ -1,5 +1,9 @@
-﻿using scada_back.Models;
+using Microsoft.Extensions.Options;
+using MongoDB.Driver;
+using scada_back.Hubs;
+using scada_back.Models;
 using scada_back.Services;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,29 +11,33 @@ builder.Services.Configure<ScadaDatabaseSettings>(
     builder.Configuration.GetSection("scada"));
 builder.Services.AddSingleton<MongoDBService>();
 builder.Services.AddSingleton<TagsService>();
+builder.Services.AddSingleton<UserService>();
+builder.Services.AddSingleton<ReportsService>();
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
-
-// Add services to the container.
 
 builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// WebSocket - SignalR
+builder.Services.AddSignalR();
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: MyAllowSpecificOrigins,
                       policy =>
                       {
-                          policy.WithOrigins("*").AllowAnyHeader()
-                                                  .AllowAnyMethod(); ;
+                          policy.WithOrigins("http://localhost:3000")
+                          .AllowAnyHeader()
+                          .AllowAnyMethod()
+                          .AllowCredentials();
                       });
 });
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -44,5 +52,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.Run();
+app.MapHub<TagsHub>("/hubs/tags");
+app.MapHub<AlarmsHub>("/hubs/alarms");
 
+app.Run();

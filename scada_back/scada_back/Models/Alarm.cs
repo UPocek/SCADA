@@ -2,17 +2,29 @@
 using System.ComponentModel.DataAnnotations;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using scada_back.DTOs;
 
 namespace scada_back.Models
 {
     public class Alarm
     {
-        [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
-        public String Id { get; set; }
-        public String Direction { get; set; }
-        public Double Value { get; set; }
+        public string Direction { get; set; }
+        public double Value { get; set; }
         public int Priority { get; set; }
+
+        public Alarm(AlarmDTO alarm)
+        {
+            Direction = alarm.Direction;
+            Value = alarm.Value;
+            Priority = alarm.Priority;
+        }
+
+        public Alarm(string direction, double value, int priority)
+        {
+            Direction = direction;
+            Value = value;
+            Priority = priority;
+        }
 
         public Alarm()
         {

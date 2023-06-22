@@ -1,0 +1,72 @@
+.mainContainer{
+    margin: 0 auto;
+    width: 60%;
+}
+
+.rtuContainer{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    row-gap: 3rem;
+}
+
+.rtuWrapper{
+    margin: 0 auto;
+}
+
+.rtu{
+    background: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--LightNote);
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.metering{
+    margin: 0 1rem;
+    display: flex;
+    align-items: center;
+}
+
+.meterName{
+    margin-bottom: 0;
+}
+
+.IObtns{
+    border: 1px solid var(--LightNote);
+    border-radius: 8px;
+    margin-left: 1rem;
+    display: flex;
+}
+
+.onBtn{
+    border: 1px solid var(--LightNote);
+    border-radius: 8px 0px 0px 8px;
+    padding: 0.5rem;
+}
+
+.black{
+    background-color: black;
+    color: aliceblue;
+}
+
+.offBtn{
+    border: 1px solid var(--LightNote);
+    border-radius: 0px 8px 8px 0px;
+    padding: 0.5rem;
+}
+
+.signal{
+    width: 30px;
+    height: 30px;
+    border: 1px solid var(--LightNote);
+    border-radius: 50%;
+    margin: 1rem;
+}
+
+.onSignal{
+    background-color: green;
+}
+
+.offSignal{
+    background-color: yellowgreen;
+}

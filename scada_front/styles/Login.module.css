@@ -1,0 +1,68 @@
+.registrationDiv {
+    width: 40%;
+    margin: auto;
+    margin-top: 5rem;
+    padding: 1rem;
+    background-color: hsla(0, 0%, 100%, .8);
+    box-shadow: inset 0 -1px 0 0 rgba(0, 0, 0, .1);
+    border-radius: 6px;
+}
+
+.nameDiv {
+    display: flex;
+}
+
+.nameDiv>div {
+    width: 50%;
+}
+
+.innerNameDiv {
+    margin-right: 0.75rem;
+}
+
+.inputDiv {
+    margin: 1.5rem;
+}
+
+.inputField {
+    width: 100%;
+    height: 100%;
+    border: 1px solid var(--LightNote);
+    border-radius: 6px;
+    padding: 0.75rem;
+}
+
+.inputField:focus {
+    outline: none !important;
+    border: 2px solid green;
+}
+
+.submitDiv {
+    margin: auto;
+    width: 20%;
+}
+
+.submitBtn {
+    width: 100%;
+    background-color: green;
+    border: 0px solid green;
+    border-radius: 6px;
+    padding: 10px;
+    color: aliceblue;
+    font-weight: 800;
+}
+
+.submitBtn:focus {
+    outline: none !important;
+    border: 0px solid green;
+}
+
+
+.submitBtn:hover {
+    cursor: pointer;
+}
+
+.titleDiv {
+    text-align: center;
+    margin-bottom: 2rem;
+}

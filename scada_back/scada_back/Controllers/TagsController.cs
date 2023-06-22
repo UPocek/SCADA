@@ -1,5 +1,9 @@
 ﻿using System;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
+using scada_back.DTOs;
+using scada_back.Hubs;
+using scada_back.Hubs.Clients;
 using scada_back.Models;
 using scada_back.Services;
 
@@ -17,13 +21,65 @@ namespace scada_back.Controllers
             _tagsService = tagsService;
         }
 
-        [HttpGet]
-        public async Task<List<AnalogInput>> GetAnalogInputs()
+        [HttpGet("analog")]
+        public async Task<List<AddressValueAnalog>> GetAnalogAddresses()
         {
-            return await _tagsService.GetAllAnalogInputsAsync();
-
+            return await _tagsService.GetAllAnalogAddressesAsync();
         }
 
+        [HttpGet("digital")]
+        public async Task<List<AddressValueDigital>> GetDigitalAddresses()
+        {
+            return await _tagsService.GetAllDigitalAddressesAsync();
+        }
+
+        [HttpPut("digital/turnSwitch/{address}")]
+        public async Task<IActionResult> TurnSwitchDigitalTag(string address)
+        {
+            await _tagsService.TurnSwitchDigitalTag(address);
+            return Ok();
+        }
+
+        [HttpPut("analog/turnSwitch/{address}")]
+        public async Task<IActionResult> TurnSwitchAnalogTag(string address)
+        {
+            await _tagsService.TurnSwitchAnalogTag(address);
+            return Ok();
+        }
+
+        [HttpPut("digital/{address}")]
+        public async Task<IActionResult> UpdateDigitalTag(string address, int value)
+        {
+            await _tagsService.UpdateDigitalTag(address, value);
+            return Ok();
+        }
+
+        [HttpPut("analog/{address}")]
+        public async Task<IActionResult> UpdateAnalogTag(string address, double value)
+        {
+            await _tagsService.UpdateAnalogTag(address, value);
+            return Ok();
+        }
+
+        [HttpPut("control/{address}")]
+        public async Task<IActionResult> ControlTag(string address, double value, string type)
+        {
+            try
+            {
+                await _tagsService.ControlTag(address, value, type);
+                return Ok();
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+
+        [HttpGet("controls")]
+        public async Task<List<ControlValuesDTO>> GetControlValues()
+        {
+            return await _tagsService.GetAllControlValues();
+        }
     }
 }
 
