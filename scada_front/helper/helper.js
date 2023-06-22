@@ -5,3 +5,7 @@ export function getUser() {
 export function getUserId() {
     return JSON.parse(localStorage.getItem('user'))['id']
 }
+
+export function getIsAdmin() {
+    return JSON.parse(localStorage.getItem('user'))['isAdmin']
+}

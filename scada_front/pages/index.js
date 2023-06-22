@@ -2,7 +2,7 @@ import Image from 'next/image'
 import styles from '@/styles/Home.module.css'
 import NavBar from '@/components/navbar'
 import { useEffect, useState } from 'react'
-import { getUserId } from '@/helper/helper'
+import { getIsAdmin, getUserId } from '@/helper/helper'
 import axios from 'axios'
 import { baseUrl } from './_app'
 import { HubConnectionBuilder } from '@microsoft/signalr';
@@ -17,8 +17,10 @@ export default function Home() {
   const [availableAnalogAddresses, setAvailableAnalogAddresses] = useState([]);
   const [availableDigitalAddresses, setAvailableDigitalAddresses] = useState([]);
   const [activeAlarms, setActiveAlarms] = useState([]);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
+    setIsAdmin(getIsAdmin())
     if (!localStorage.getItem('user')) { router.replace('/login'); return; }
     axios.get(`${baseUrl}/User/userTagsInfo/${getUserId()}`).then(response => updateUserInfo(response.data)).catch(err => console.log("Error on user tags info"));
     axios.get(`${baseUrl}/Tags/controls`).then(response => setControls(response.data)).catch(err => console.log("Error on controls addresses"));
@@ -103,19 +105,19 @@ export default function Home() {
   return (
     <>
       <NavBar />
-      <AllTags tags={tags} availableAnalogAddresses={availableAnalogAddresses} availableDigitalAddresses={availableDigitalAddresses} setTags={setTags} setAvailableAnalogAddresses={setAvailableAnalogAddresses} setAvailableDigitalAddresses={setAvailableDigitalAddresses} activeAlarms={activeAlarms} setActiveAlarms={setActiveAlarms} controls={controls} setControls={setControls} />
+      <AllTags isAdmin={isAdmin} tags={tags} availableAnalogAddresses={availableAnalogAddresses} availableDigitalAddresses={availableDigitalAddresses} setTags={setTags} setAvailableAnalogAddresses={setAvailableAnalogAddresses} setAvailableDigitalAddresses={setAvailableDigitalAddresses} activeAlarms={activeAlarms} setActiveAlarms={setActiveAlarms} controls={controls} setControls={setControls} />
     </>
   )
 }
 
-function AllTags({ tags, availableAnalogAddresses, availableDigitalAddresses, setAvailableAnalogAddresses, setAvailableDigitalAddresses, setTags, setUser, user, activeAlarms, setActiveAlarms, controls, setControls }) {
+function AllTags({ isAdmin, tags, availableAnalogAddresses, availableDigitalAddresses, setAvailableAnalogAddresses, setAvailableDigitalAddresses, setTags, setUser, user, activeAlarms, setActiveAlarms, controls, setControls }) {
   const [addDigitalTag, setAddDigitalTag] = useState(false)
   const [addAnalogTag, setAddAnalogTag] = useState(false)
-
+  console.log(isAdmin)
   return (
     <div className={styles.container}>
       <div className={styles.tags}>
-        <div>
+        {isAdmin && <div>
           <div className={styles.addTag} onClick={() => setAddAnalogTag(!addAnalogTag)}>
             <h3>Add Analog Tag </h3>
             <Image alt='add tag' src='/images/plus.png' width={24} height={24} />
@@ -125,20 +127,21 @@ function AllTags({ tags, availableAnalogAddresses, availableDigitalAddresses, se
             <h3>Add Digital Tag </h3>
             <Image alt='add tag' src='/images/plus.png' width={24} height={24} />
           </div>
-        </div>
+        </div>}
+
         <table className={styles.main_table}>
           <thead>
             <tr>
               <th>Tag Name</th>
               <th>Value</th>
               <th>Set value</th>
-              <th>On Scan/Off Scan</th>
-              <th>Delete</th>
-              <th>Add Alarm</th>
+              {isAdmin && <><th>On Scan/Off Scan</th>
+                <th>Delete</th>
+                <th>Add Alarm</th></>}
             </tr>
           </thead>
           <tbody>
-            {tags.map(tag => <Tag tag={tag} key={tag['ioAddress']} tags={tags} setTags={setTags} controls={controls} />)}
+            {tags.map(tag => <Tag isAdmin={isAdmin} tag={tag} key={tag['ioAddress']} tags={tags} setTags={setTags} controls={controls} />)}
           </tbody>
         </table>
 
@@ -152,7 +155,7 @@ function AllTags({ tags, availableAnalogAddresses, availableDigitalAddresses, se
   );
 }
 
-function Tag({ tag, tags, setTags, controls }) {
+function Tag({ isAdmin, tag, tags, setTags, controls }) {
   const [isOn, setIsOn] = useState(tag['onOffScan']);
   const [addNewAlarm, setAddNewAlarm] = useState(false);
   const [oldValue, setOldValue] = useState(0);
@@ -200,17 +203,18 @@ function Tag({ tag, tags, setTags, controls }) {
           {tag['alarms'] ? <input className={styles.inputField} type="text" id="newValue" name="newValue" value={valueChange} onChange={e => setValueChange(e.target.value)} /> : <select id="newValue" name="newValue" value={oldValue} className={styles.inputField} onChange={controlSystem}><option value={0}>0</option> <option value={1}>1</option></select>}
         </form>
       </td>
-      <td><div className={styles.IObtns}>
-        <div className={`${styles.onBtn} ${isOn ? styles.black : ''}`} onClick={() => ChangeScanOnOff(true)}>On</div>
-        <div className={`${styles.offBtn} ${isOn ? '' : styles.black}`} onClick={() => ChangeScanOnOff(false)}>Off</div>
-      </div>
-      </td>
-      <td><div className={styles.icon} onClick={deleteTag}>
-        <Image alt='remove' src='/images/remove.png' width={24} height={24} />
-      </div></td>
-      {tag['alarms'] && <td><div className={styles.icon} onClick={() => setAddNewAlarm(!addNewAlarm)}>
-        <Image alt='add alarm' src='/images/add.png' width={24} height={24} />
-      </div></td>}
+      {isAdmin && <>
+        <td><div className={styles.IObtns}>
+          <div className={`${styles.onBtn} ${isOn ? styles.black : ''}`} onClick={() => ChangeScanOnOff(true)}>On</div>
+          <div className={`${styles.offBtn} ${isOn ? '' : styles.black}`} onClick={() => ChangeScanOnOff(false)}>Off</div>
+        </div>
+        </td>
+        <td><div className={styles.icon} onClick={deleteTag}>
+          <Image alt='remove' src='/images/remove.png' width={24} height={24} />
+        </div></td>
+        {tag['alarms'] && <td><div className={styles.icon} onClick={() => setAddNewAlarm(!addNewAlarm)}>
+          <Image alt='add alarm' src='/images/add.png' width={24} height={24} />
+        </div></td>}</>}
     </tr>
     {(addNewAlarm && tag['alarms']) && <NewAlarm tag={tag} setAddNewAlarm={setAddNewAlarm} addNewAlarm={addNewAlarm} />}
   </>
