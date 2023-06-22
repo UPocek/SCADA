@@ -44,6 +44,12 @@ namespace scada_back.Controllers
             return loggedInUser;
         }
 
+        [HttpGet("userTagsInfo/{userId}")]
+        public async Task<UserTagsInfoDTO> UserTagsInfo(string userId)
+        {
+            return await _userService.getUserTagsInfo(userId);
+        }
+
 
         [HttpPost("{userId}/addTag/analog")]
         public async Task<ActionResult<AnalogInput>> AddNewAnalogTag(string userId, AnalogTagDTO analogTag)

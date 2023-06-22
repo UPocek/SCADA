@@ -20,23 +20,8 @@ export default function Home() {
   const [activeAlarms, setActiveAlarms] = useState([]);
 
   useEffect(() => {
-    let user = getUser()
-    if (user != undefined) {
-      setUser(user)
-      let userTags = []
-      userTags.push(...user['analogInputs'])
-      userTags.push(...user['digitalInputs'])
-      setTags(userTags)
-
-      axios.get(`${baseUrl}/Tags/analog`).then(response => setAvailableAddresses(response.data, userTags, setAvailableAnalogAddresses)).catch(err => console.log("Error on analog addresses"));
-      axios.get(`${baseUrl}/Tags/digital`).then(response => setAvailableAddresses(response.data, userTags, setAvailableDigitalAddresses)).catch(err => console.log("Error on digital addresses"));
-      axios.get(`${baseUrl}/Tags/controls`).then(response => setControls(response.data)).catch(err => console.log("Error on controls addresses"));
-    }
-
-  }, [])
-
-  useEffect(() => {
     localStorage.getItem('user') == null && router.replace('/login');
+    const response = axios.get(`${baseUrl}/User/userTagsInfo/${getUserId()}`).then(response => updateUserInfo(response.data)).catch(err => console.log("Error on user tags info"));
     const newConnectionTags = new HubConnectionBuilder()
       .withUrl('https://localhost:7214/hubs/tags')
       .withAutomaticReconnect()
@@ -79,20 +64,23 @@ export default function Home() {
   }, [connectionTags, connectionAlarms]);
 
   function updateTag(id, value) {
-    setTags(tags.map(tag => { if (tag['id'] == id) { tag['value'] = value } return tag }))
-  }
-
-  function setAvailableAddresses(addresses, userTags, setAddresses) {
-    let newAddresses = addresses.map(o => o['address'])
-    for (let tag of userTags) {
-      if (newAddresses.includes(tag['ioAddress'])) {
-        const index = newAddresses.indexOf(tag['ioAddress']);
-        if (index > -1) {
-          newAddresses.splice(index, 1);
-        }
+    if (tags.length <= 0) return;
+    let updatedTags = [...tags]
+    for (let tag of updatedTags) {
+      if (tag['id'] == id) {
+        tag['value'] = value
       }
     }
-    setAddresses(newAddresses)
+    setTags(updatedTags);
+  }
+
+  function updateUserInfo(data) {
+    let userTags = [];
+    userTags.push(...data['analogInputs']);
+    userTags.push(...data['digitalInputs']);
+    setTags(userTags);
+    setAvailableAnalogAddresses([...data['availableAnalogInputs']]);
+    setAvailableDigitalAddresses([...data['availableDigitalInputs']]);
   }
 
   return (

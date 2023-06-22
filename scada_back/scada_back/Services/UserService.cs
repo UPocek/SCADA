@@ -37,6 +37,21 @@ namespace scada_back.Services
             return user;
         }
 
+        public async Task<UserTagsInfoDTO> getUserTagsInfo(string userId)
+        {
+            User user = await _mongo._userCollection.Find<User>(user => user.Id == userId).SingleOrDefaultAsync();
+            var usedAnalogAddresses = user.AnalogInputs.Select(input => input.IOAddress).ToList();
+            var usedDigitalAddresses = user.DigitalInputs.Select(input => input.IOAddress).ToList();
+
+            List<string> allAnalogAddresses = (await _mongo._addressValueAnalogCollection.Find(_ => true).ToListAsync()).Select(input => input.Address).ToList();
+            List<string> allDigitalAddresses = (await _mongo._addressValueDigitalCollection.Find(_ => true).ToListAsync()).Select(input => input.Address).ToList();
+
+            List<string> availableAnalogAddresses = allAnalogAddresses.Where(item => !usedAnalogAddresses.Contains(item)).ToList();
+            List<string> availableDigitalAddresses = allDigitalAddresses.Where(item => !usedDigitalAddresses.Contains(item)).ToList();
+            UserTagsInfoDTO userTagsInfoDTO = new UserTagsInfoDTO(user.AnalogInputs, user.DigitalInputs, availableAnalogAddresses, availableDigitalAddresses);
+            return userTagsInfoDTO;
+        }
+
         public async Task<AnalogInput> AddNewAnalogTag(AnalogTagDTO newTag, string userId)
         {
             User user = await _mongo._userCollection.Find(item => item.Id == userId).SingleOrDefaultAsync();
