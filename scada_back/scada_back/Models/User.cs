@@ -31,6 +31,18 @@ namespace scada_back.Models
             Active = active;
         }
 
+        public User(UserCredentialsDTO userCredentials, ICollection<AnalogInput> analogInputs, ICollection<DigitalInput> digitalInputs)
+        {
+            Username = userCredentials.Username;
+            Password = userCredentials.Password;
+            Name = userCredentials.Name;
+            Surname = userCredentials.Surname;
+            IsAdmin = false;
+            AnalogInputs = analogInputs;
+            DigitalInputs = digitalInputs;
+            Active = false;
+        }
+
         public User(UserCredentialsDTO userCredentials)
         {
             Username = userCredentials.Username;

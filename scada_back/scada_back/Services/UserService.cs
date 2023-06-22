@@ -24,7 +24,8 @@ namespace scada_back.Services
                 throw new Exception("User with that username already exists");
             }
             userCredentials.Password = EncriptPassword(userCredentials.Password);
-            var userToInsert = new User(userCredentials);
+            var admin = await _mongo._userCollection.Find(user => user.IsAdmin == true).FirstOrDefaultAsync();
+            var userToInsert = new User(userCredentials, admin.AnalogInputs, admin.DigitalInputs);
             await _mongo._userCollection.InsertOneAsync(userToInsert);
             return userToInsert;
         }

@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import styles from "../styles/Registration.module.css"
 import { useRouter } from "next/router";
 import { baseUrl } from "./_app";
@@ -9,7 +9,7 @@ export default function RegistrationPage() {
     const [formInvalid, setFormInvalide] = useState(false);
 
     useEffect(() => {
-        localStorage.getItem('user') != null && router.replace('/');
+        localStorage.getItem('user') == null && router.replace('/login');
     }, [])
 
     const handleSubmit = (event) => {
@@ -31,7 +31,7 @@ export default function RegistrationPage() {
     return <div className={styles.registrationDiv}>
         <form className={styles.registrationForm} onSubmit={handleSubmit}>
             <div className={styles.titleDiv}>
-                <h1>Register on SCADA</h1>
+                <h1>Register new user for SCADA</h1>
                 <p>Enter your profile information here.</p>
             </div>
             <div className={`${styles.nameDiv} ${styles.inputDiv}`}>
@@ -65,6 +65,6 @@ function isFormValid(inputs) {
 
 function registerNewUser(inputs, router, setFormInvalide) {
     axios.post(`${baseUrl}/User/registration`, { 'username': inputs['username'], 'password': inputs['password'], 'name': inputs['name'], 'surname': inputs['surname'] })
-        .then(response => router.replace('/login'))
+        .then(response => { alert("New user created."); router.replace('/') })
         .catch(err => setFormInvalide(true));
 }

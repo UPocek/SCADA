@@ -27,6 +27,7 @@ export default function NavBar() {
             <ul className={navStyle.navUl}>
                 <li><Link className={navStyle.navItem} href="/" >Control Panel</Link></li>
                 <li><Link className={navStyle.navItem} href="/reports">Reports</Link></li>
+                <li><Link className={navStyle.navItem} href="/registration">Create account</Link></li>
             </ul>
             <ul className={navStyle.navUl}>
                 <Link className={navStyle.signOut} href="/" onClick={logOut}>Sign out</Link>
