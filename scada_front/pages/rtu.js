@@ -43,10 +43,28 @@ function RTU({ name, tags }) {
 }
 
 function Metering({ tag }) {
-    const [isOn, setIsOn] = useState(false);
+    const [isOn, setIsOn] = useState(tag['onOffScan']);
     const [job, setJob] = useState(null);
-    const url = tag['highLimit'] ? `${baseUrl}/Tags/analog/${tag['address']}` : `${baseUrl}/Tags/digital/${tag['address']}`
+    const urlForUpdate = tag['highLimit'] ? `${baseUrl}/Tags/analog/${tag['address']}` : `${baseUrl}/Tags/digital/${tag['address']}`
+    const urlToSwitch = tag['highLimit'] ? `${baseUrl}/Tags/analog/turnSwitch/${tag['address']}` : `${baseUrl}/Tags/digital/turnSwitch/${tag['address']}`
     const getRandomValue = tag['highLimit'] ? getRandomAnalog : getRandomDigital;
+
+    useEffect(() => {
+        if (isOn) {
+            const intervalId = setInterval(() => {
+                const signal = getRandomValue()
+                axios.put(urlForUpdate, null, {
+                    params: {
+                        value: signal,
+                    }
+                })
+                console.log(signal)
+            }, tag['scanTime'])
+
+            return () => { clearInterval(intervalId); }
+        }
+    }, [isOn])
+
 
     function getRandomDigital() {
         return Math.floor(Math.random() * 2);
@@ -57,21 +75,28 @@ function Metering({ tag }) {
     }
 
     function TurnOnTag() {
-        setIsOn(true);
-        setJob(setInterval(() => {
-            const signal = getRandomValue()
-            axios.put(url, null, {
-                params: {
-                    value: signal,
-                }
-            })
-            console.log(signal)
-        }, tag['scanTime']))
+        if (!isOn) {
+            axios.put(urlToSwitch, null)
+            setIsOn(true);
+            // const newIntervalId = setInterval(() => {
+            //     const signal = getRandomValue()
+            //     axios.put(urlForUpdate, null, {
+            //         params: {
+            //             value: signal,
+            //         }
+            //     })
+            //     console.log(signal)
+            // }, tag['scanTime'])
+            // setJob(newIntervalId)
+        }
     }
 
     function TurnOffTag() {
-        setIsOn(false);
-        clearInterval(job);
+        if (isOn) {
+            axios.put(urlToSwitch, null)
+            setIsOn(false);
+            // clearInterval(job);
+        }
     }
 
     return <div >

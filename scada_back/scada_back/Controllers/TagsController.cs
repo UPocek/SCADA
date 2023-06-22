@@ -33,6 +33,20 @@ namespace scada_back.Controllers
             return await _tagsService.GetAllDigitalAddressesAsync();
         }
 
+        [HttpPut("digital/turnSwitch/{address}")]
+        public async Task<IActionResult> TurnSwitchDigitalTag(string address)
+        {
+            await _tagsService.TurnSwitchDigitalTag(address);
+            return Ok();
+        }
+
+        [HttpPut("analog/turnSwitch/{address}")]
+        public async Task<IActionResult> TurnSwitchAnalogTag(string address)
+        {
+            await _tagsService.TurnSwitchAnalogTag(address);
+            return Ok();
+        }
+
         [HttpPut("digital/{address}")]
         public async Task<IActionResult> UpdateDigitalTag(string address, int value)
         {
