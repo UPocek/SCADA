@@ -12,7 +12,6 @@ export default function Home() {
   const router = useRouter();
   const [connectionTags, setConnectionTags] = useState(null);
   const [connectionAlarms, setConnectionAlarms] = useState(null);
-  const [user, setUser] = useState({});
   const [tags, setTags] = useState([]);
   const [controls, setControls] = useState([]);
   const [availableAnalogAddresses, setAvailableAnalogAddresses] = useState([]);
@@ -86,7 +85,7 @@ export default function Home() {
   return (
     <>
       <NavBar />
-      <AllTags tags={tags} availableAnalogAddresses={availableAnalogAddresses} availableDigitalAddresses={availableDigitalAddresses} setTags={setTags} setAvailableAnalogAddresses={setAvailableAnalogAddresses} setAvailableDigitalAddresses={setAvailableDigitalAddresses} setUser={setUser} user={user} activeAlarms={activeAlarms} setActiveAlarms={setActiveAlarms} controls={controls} setControls={setControls} />
+      <AllTags tags={tags} availableAnalogAddresses={availableAnalogAddresses} availableDigitalAddresses={availableDigitalAddresses} setTags={setTags} setAvailableAnalogAddresses={setAvailableAnalogAddresses} setAvailableDigitalAddresses={setAvailableDigitalAddresses} activeAlarms={activeAlarms} setActiveAlarms={setActiveAlarms} controls={controls} setControls={setControls} />
     </>
   )
 }
@@ -121,7 +120,7 @@ function AllTags({ tags, availableAnalogAddresses, availableDigitalAddresses, se
             </tr>
           </thead>
           <tbody>
-            {tags.map(tag => <Tag tag={tag} key={tag['ioAddress']} tags={tags} setTags={setTags} setUser={setUser} user={user} controls={controls} />)}
+            {tags.map(tag => <Tag tag={tag} key={tag['ioAddress']} tags={tags} setTags={setTags} controls={controls} />)}
           </tbody>
         </table>
 
@@ -135,7 +134,7 @@ function AllTags({ tags, availableAnalogAddresses, availableDigitalAddresses, se
   );
 }
 
-function Tag({ tag, tags, setTags, setUser, user, controls }) {
+function Tag({ tag, tags, setTags, controls }) {
   const [isOn, setIsOn] = useState(tag['onOffScan']);
   const [addNewAlarm, setAddNewAlarm] = useState(false);
   const [oldValue, setOldValue] = useState(0);
@@ -164,13 +163,6 @@ function Tag({ tag, tags, setTags, setUser, user, controls }) {
   }
 
   function removeTagFromTags() {
-    const newUser = JSON.parse(JSON.stringify(user))
-    if (tag['alarms']) {
-      newUser['analogInputs'] = newUser['analogInputs'].filter(t => t['ioAddress'] != tag['ioAddress'])
-    } else {
-      newUser['digitalInputs'] = newUser['digitalInputs'].filter(t => t['ioAddress'] != tag['ioAddress'])
-    }
-    setUser(newUser)
     const newTags = [...tags].filter(t => t['ioAddress'] != tag['ioAddress'])
     setTags(newTags)
   }
