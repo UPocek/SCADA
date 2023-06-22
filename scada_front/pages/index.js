@@ -20,7 +20,8 @@ export default function Home() {
 
   useEffect(() => {
     localStorage.getItem('user') == null && router.replace('/login');
-    const response = axios.get(`${baseUrl}/User/userTagsInfo/${getUserId()}`).then(response => updateUserInfo(response.data)).catch(err => console.log("Error on user tags info"));
+    axios.get(`${baseUrl}/User/userTagsInfo/${getUserId()}`).then(response => updateUserInfo(response.data)).catch(err => console.log("Error on user tags info"));
+    axios.get(`${baseUrl}/Tags/controls`).then(response => setControls(response.data)).catch(err => console.log("Error on controls addresses"));
     const newConnectionTags = new HubConnectionBuilder()
       .withUrl('https://localhost:7214/hubs/tags')
       .withAutomaticReconnect()

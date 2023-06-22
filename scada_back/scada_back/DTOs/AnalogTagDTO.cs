@@ -19,7 +19,6 @@ namespace scada_back.DTOs
             HighLimit = highLimit;
         }
 
-
         public AnalogTagDTO()
         {
         }
