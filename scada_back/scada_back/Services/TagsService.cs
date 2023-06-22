@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -213,6 +214,38 @@ namespace scada_back.Services
             var tag = await _mongo._addressValueDigitalCollection.Find(item => item.Address == digitalInput.IOAddress).SingleOrDefaultAsync();
             user.DigitalInputs.Where(input => input.Id == digitalInput.Id).Single().Value = tag.Value;
             await _mongo._userCollection.ReplaceOneAsync(item => item.Id == user.Id, user);
+        }
+
+        public async Task ControlTag(string address, double value, string type)
+        {
+            if (type == "analog")
+            {
+                var control = Builders<ControlAnalog>.Update.Set("Value", value);
+                await _mongo._controlAnalogCollection.UpdateOneAsync(item => item.Address == address, control);
+            }
+            else if (type == "digital")
+            {
+                var control = Builders<ControlDigital>.Update.Set("Value", (int)value);
+                await _mongo._controlDigitalCollection.UpdateOneAsync(item => item.Address == address, control);
+            }
+            else
+            {
+                throw new Exception("Invalid type");
+            }
+        }
+
+        public async Task<List<ControlValuesDTO>> GetAllControlValues()
+        {
+            List<ControlValuesDTO> controlValues = new List<ControlValuesDTO>();
+            foreach (var control in await _mongo._controlAnalogCollection.Find(_ => true).ToListAsync())
+            {
+                controlValues.Add(new ControlValuesDTO(control.Address, control.Value));
+            }
+            foreach (var control in await _mongo._controlDigitalCollection.Find(_ => true).ToListAsync())
+            {
+                controlValues.Add(new ControlValuesDTO(control.Address, control.Value));
+            }
+            return controlValues;
         }
     }
 }

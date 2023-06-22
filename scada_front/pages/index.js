@@ -14,6 +14,7 @@ export default function Home() {
   const [connectionAlarms, setConnectionAlarms] = useState(null);
   const [user, setUser] = useState({});
   const [tags, setTags] = useState([]);
+  const [controls, setControls] = useState([]);
   const [availableAnalogAddresses, setAvailableAnalogAddresses] = useState([]);
   const [availableDigitalAddresses, setAvailableDigitalAddresses] = useState([]);
   const [activeAlarms, setActiveAlarms] = useState([]);
@@ -27,8 +28,9 @@ export default function Home() {
       userTags.push(...user['digitalInputs'])
       setTags(userTags)
 
-      axios.get(`${baseUrl}/Tags/analog`).then(response => setAvailableAddresses(response.data, userTags, setAvailableAnalogAddresses)).catch(err => console.log(err, "Error on analog addresses"))
-      axios.get(`${baseUrl}/Tags/digital`).then(response => setAvailableAddresses(response.data, userTags, setAvailableDigitalAddresses)).catch(err => console.log("Error on digital addresses"))
+      axios.get(`${baseUrl}/Tags/analog`).then(response => setAvailableAddresses(response.data, userTags, setAvailableAnalogAddresses)).catch(err => console.log("Error on analog addresses"));
+      axios.get(`${baseUrl}/Tags/digital`).then(response => setAvailableAddresses(response.data, userTags, setAvailableDigitalAddresses)).catch(err => console.log("Error on digital addresses"));
+      axios.get(`${baseUrl}/Tags/controls`).then(response => setControls(response.data)).catch(err => console.log("Error on controls addresses"));
     }
 
   }, [])
@@ -96,12 +98,12 @@ export default function Home() {
   return (
     <>
       <NavBar />
-      <AllTags tags={tags} availableAnalogAddresses={availableAnalogAddresses} availableDigitalAddresses={availableDigitalAddresses} setTags={setTags} setAvailableAnalogAddresses={setAvailableAnalogAddresses} setAvailableDigitalAddresses={setAvailableDigitalAddresses} setUser={setUser} user={user} activeAlarms={activeAlarms} setActiveAlarms={setActiveAlarms} />
+      <AllTags tags={tags} availableAnalogAddresses={availableAnalogAddresses} availableDigitalAddresses={availableDigitalAddresses} setTags={setTags} setAvailableAnalogAddresses={setAvailableAnalogAddresses} setAvailableDigitalAddresses={setAvailableDigitalAddresses} setUser={setUser} user={user} activeAlarms={activeAlarms} setActiveAlarms={setActiveAlarms} controls={controls} setControls={setControls} />
     </>
   )
 }
 
-function AllTags({ tags, availableAnalogAddresses, availableDigitalAddresses, setAvailableAnalogAddresses, setAvailableDigitalAddresses, setTags, setUser, user, activeAlarms, setActiveAlarms }) {
+function AllTags({ tags, availableAnalogAddresses, availableDigitalAddresses, setAvailableAnalogAddresses, setAvailableDigitalAddresses, setTags, setUser, user, activeAlarms, setActiveAlarms, controls, setControls }) {
   const [addDigitalTag, setAddDigitalTag] = useState(false)
   const [addAnalogTag, setAddAnalogTag] = useState(false)
 
@@ -131,7 +133,7 @@ function AllTags({ tags, availableAnalogAddresses, availableDigitalAddresses, se
             </tr>
           </thead>
           <tbody>
-            {tags.map(tag => <Tag tag={tag} key={tag['ioAddress']} tags={tags} setTags={setTags} setUser={setUser} user={user} />)}
+            {tags.map(tag => <Tag tag={tag} key={tag['ioAddress']} tags={tags} setTags={setTags} setUser={setUser} user={user} controls={controls} />)}
           </tbody>
         </table>
 
@@ -145,10 +147,15 @@ function AllTags({ tags, availableAnalogAddresses, availableDigitalAddresses, se
   );
 }
 
-function Tag({ tag, tags, setTags, setUser, user }) {
+function Tag({ tag, tags, setTags, setUser, user, controls }) {
   const [isOn, setIsOn] = useState(tag['onOffScan']);
   const [addNewAlarm, setAddNewAlarm] = useState(false);
   const [newValue, setNewValue] = useState(0);
+
+  useEffect(() => {
+    setNewValue(controls.find(item => item['address'] == tag['ioAddress']) ? controls.find(item => item['address'] == tag['ioAddress'])['value'] : 0);
+  }, [controls])
+
 
   function ChangeScanOnOff(answer) {
     if (tag['alarms']) {
@@ -178,12 +185,19 @@ function Tag({ tag, tags, setTags, setUser, user }) {
     setTags(newTags)
   }
 
+  function controlSystem(e) {
+    e.preventDefault();
+    axios.put(`${baseUrl}/Tags/control/${tag['ioAddress']}?value=${e.target.newValue.value}&type=${tag['alarms'] ? 'analog' : 'digital'}`).then(response => alert(`${tag['description']} set to ${e.target.newValue.value}`)).catch(err => { console.log(err); alert("Value not set!"); setNewValue(0); })
+  }
+
   return <>
     <tr>
       <td>{tag['description']}</td>
       <td>{tag['value']}</td>
       <td>
-        <input className={styles.inputField} type="text" id="newValue" name="newValue" value={newValue} onChange={e => setNewValue(e.target.value)} />
+        <form onSubmit={controlSystem}>
+          <input className={styles.inputField} type="text" id="newValue" name="newValue" value={newValue} onChange={e => setNewValue(e.target.value)} />
+        </form>
       </td>
       <td><div className={styles.IObtns}>
         <div className={`${styles.onBtn} ${isOn ? styles.black : ''}`} onClick={() => ChangeScanOnOff(true)}>On</div>

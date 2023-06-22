@@ -18,6 +18,10 @@ namespace scada_back.Models
         public string TagValueCollectionName { get; set; } = null!;
 
         public string HistoryCollectionName { get; set; } = null!;
+
+        public string ControlAnalogCollectionName { get; set; } = null!;
+
+        public string ControlDigitalCollectionName { get; set; } = null!;
     }
 }
 

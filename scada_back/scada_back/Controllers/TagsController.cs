@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using scada_back.DTOs;
 using scada_back.Hubs;
 using scada_back.Hubs.Clients;
 using scada_back.Models;
@@ -44,6 +45,26 @@ namespace scada_back.Controllers
         {
             await _tagsService.UpdateAnalogTag(address, value);
             return Ok();
+        }
+
+        [HttpPut("control/{address}")]
+        public async Task<IActionResult> ControlTag(string address, double value, string type)
+        {
+            try
+            {
+                await _tagsService.ControlTag(address, value, type);
+                return Ok();
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+
+        [HttpGet("controls")]
+        public async Task<List<ControlValuesDTO>> GetControlValues()
+        {
+            return await _tagsService.GetAllControlValues();
         }
     }
 }

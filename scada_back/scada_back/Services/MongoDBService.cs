@@ -13,6 +13,8 @@ namespace scada_back.Services
         public readonly IMongoCollection<AlarmInstance> _alarmCollection;
         public readonly IMongoCollection<TagValueInstance> _tagvalueCollection;
         public readonly IMongoCollection<HistoryInstance> _historyCollection;
+        public readonly IMongoCollection<ControlAnalog> _controlAnalogCollection;
+        public readonly IMongoCollection<ControlDigital> _controlDigitalCollection;
 
         public MongoDBService(
             IOptions<ScadaDatabaseSettings> databaseSettings)
@@ -35,6 +37,10 @@ namespace scada_back.Services
                 databaseSettings.Value.TagValueCollectionName);
             _historyCollection = mongoDatabase.GetCollection<HistoryInstance>(
                 databaseSettings.Value.HistoryCollectionName);
+            _controlAnalogCollection = mongoDatabase.GetCollection<ControlAnalog>(
+                databaseSettings.Value.ControlAnalogCollectionName);
+            _controlDigitalCollection = mongoDatabase.GetCollection<ControlDigital>(
+                databaseSettings.Value.ControlDigitalCollectionName);
 
             InitializeDB();
         }
@@ -64,6 +70,26 @@ namespace scada_back.Services
             if (!_userCollection.Find(user => user.IsAdmin).Any())
             {
                 _userCollection.InsertOne(new User("admin", "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918", "Admin", "Admin", true, new List<AnalogInput>(), new List<DigitalInput>(), false));
+            }
+            if (!_controlAnalogCollection.Find(_ => true).Any())
+            {
+                List<ControlAnalog> controlAddresses = new List<ControlAnalog>();
+                List<AddressValueAnalog> analogInputs = _addressValueAnalogCollection.Find(_ => true).ToList();
+                foreach (var ai in analogInputs)
+                {
+                    controlAddresses.Add(new ControlAnalog(ai.Address, ai.Value));
+                }
+                _controlAnalogCollection.InsertMany(controlAddresses);
+            }
+            if (!_controlDigitalCollection.Find(_ => true).Any())
+            {
+                List<ControlDigital> controlAddresses = new List<ControlDigital>();
+                List<AddressValueDigital> digitalInputs = _addressValueDigitalCollection.Find(_ => true).ToList();
+                foreach (var di in digitalInputs)
+                {
+                    controlAddresses.Add(new ControlDigital(di.Address, di.Value));
+                }
+                _controlDigitalCollection.InsertMany(controlAddresses);
             }
         }
     }
