@@ -19,10 +19,8 @@ export default function Home() {
   const [activeAlarms, setActiveAlarms] = useState([]);
 
   useEffect(() => {
-    localStorage.getItem('user') == null && router.replace('/login');
-    if (localStorage.getItem('user')) {
-      axios.get(`${baseUrl}/User/userTagsInfo/${getUserId()}`).then(response => updateUserInfo(response.data)).catch(err => console.log("Error on user tags info"));
-    }
+    if (!localStorage.getItem('user')) { router.replace('/login'); return; }
+    axios.get(`${baseUrl}/User/userTagsInfo/${getUserId()}`).then(response => updateUserInfo(response.data)).catch(err => console.log("Error on user tags info"));
     axios.get(`${baseUrl}/Tags/controls`).then(response => setControls(response.data)).catch(err => console.log("Error on controls addresses"));
     const newConnectionTags = new HubConnectionBuilder()
       .withUrl('https://localhost:7214/hubs/tags')
@@ -42,10 +40,6 @@ export default function Home() {
       connectionTags.start()
         .then(result => {
           console.log('Connected to Tags!');
-          connectionTags.on('ReceiveMessage', message => {
-            console.log(message);
-            updateTag(message['tag'], message['value'])
-          });
         })
         .catch(e => console.log('Connection failed: ', e));
     }
@@ -53,9 +47,7 @@ export default function Home() {
       connectionAlarms.start()
         .then(result => {
           console.log('Connected to Alarms!');
-
           connectionAlarms.on('ReceiveMessage', message => {
-            console.log(message);
             if (message['user'] == getUserId() && activeAlarms.filter(alarm => alarm['message'] == message['message']).length == 0) {
               let alarmsNew = [...activeAlarms];
               alarmsNew.push(message);
@@ -65,21 +57,26 @@ export default function Home() {
         })
         .catch(e => console.log('Connection failed: ', e));
     }
-  }, [connectionTags, connectionAlarms]);
-
-  function updateTag(id, value) {
-    if (tags.length <= 0) {
-      console.log("NEEEE")
-      return;
-    }
-    let updatedTags = [...tags]
-    for (let tag of updatedTags) {
-      if (tag['id'] == id) {
-        tag['value'] = value
+    return () => {
+      if (connectionTags) {
+        connectionAlarms.stop();
+      }
+      if (connectionAlarms) {
+        connectionAlarms.stop();
       }
     }
-    setTags(updatedTags);
-  }
+  }, [connectionTags, connectionAlarms]);
+
+  useEffect(() => {
+    if (connectionTags && tags.length > 0) {
+      connectionTags.on('ReceiveMessage', message => {
+        updateTag(message['tag'], message['value'], tags)
+      });
+      return () => {
+        connectionTags.off('ReceiveMessage');
+      }
+    }
+  }, [tags])
 
   function updateUserInfo(data) {
     let userTags = [];
@@ -88,6 +85,19 @@ export default function Home() {
     setTags(userTags);
     setAvailableAnalogAddresses([...data['availableAnalogInputs']]);
     setAvailableDigitalAddresses([...data['availableDigitalInputs']]);
+  }
+
+  function updateTag(id, value, currentTags) {
+    if (currentTags.length <= 0) {
+      return;
+    }
+    let updatedTags = [...currentTags]
+    for (let tag of updatedTags) {
+      if (tag['id'] == id) {
+        tag['value'] = value
+      }
+    }
+    setTags(updatedTags);
   }
 
   return (
