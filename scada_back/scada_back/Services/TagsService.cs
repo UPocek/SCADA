@@ -34,6 +34,20 @@ namespace scada_back.Services
             return await _mongo._addressValueDigitalCollection.Find(_ => true).ToListAsync();
         }
 
+        public async Task TurnSwitchDigitalTag(string address)
+        {
+            var tag = await _mongo._addressValueDigitalCollection.Find(item => item.Address == address).SingleOrDefaultAsync();
+            var updateTag = Builders<AddressValueDigital>.Update.Set("OnOffScan", !tag.OnOffScan);
+            await _mongo._addressValueDigitalCollection.UpdateOneAsync(tag => tag.Address == address, updateTag);
+        }
+
+        public async Task TurnSwitchAnalogTag(string address)
+        {
+            var tag = await _mongo._addressValueAnalogCollection.Find(item => item.Address == address).SingleOrDefaultAsync();
+            var updateTag = Builders<AddressValueAnalog>.Update.Set("OnOffScan", !tag.OnOffScan);
+            await _mongo._addressValueAnalogCollection.UpdateOneAsync(tag => tag.Address == address, updateTag);
+        }
+
         public async Task UpdateDigitalTag(string address, int value)
         {
             var updateTag = Builders<AddressValueDigital>.Update.Set("Value", value);
