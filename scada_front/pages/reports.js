@@ -36,12 +36,12 @@ function SideMenu({ selectedReport, setSelectedReport }) {
 }
 
 function AllAlarmsReport() {
-    const [fromDate, setFrom] = useState(new Date().toJSON().slice(0, 10))
-    const [toDate, setTo] = useState(new Date().toJSON().slice(0, 10))
-    const [alarms, setAlarms] = useState([])
+    const [fromDate, setFrom] = useState(new Date().toJSON().slice(0, 10));
+    const [toDate, setTo] = useState(new Date().toJSON().slice(0, 10));
+    const [alarms, setAlarms] = useState([]);
 
     function getAlarms() {
-        axios.get(`${baseUrl}/Reports/allAlarmsByDate`, { params: { 'from': fromDate, 'to': toDate } }).then(response => sortAlarms(response.data)).catch(err => console.log(err, " error get all alarm reports"))
+        axios.get(`${baseUrl}/Reports/allAlarmsByDate`, { params: { 'from': fromDate, 'to': toDate } }).then(response => sortAlarms(response.data)).catch(err => console.log(err, " error get all alarm reports"));
     }
 
     function sortAlarms(data) {
@@ -71,7 +71,7 @@ function AllAlarmsReport() {
             return 0;
         });
 
-        setAlarms(data)
+        setAlarms(data);
     }
 
     return <div className={styles.report}>
@@ -102,7 +102,7 @@ function PriorityAlarmsReport() {
     const [priority, setPriority] = useState('1')
     const [alarms, setAlarms] = useState([])
     function getAlarms() {
-        axios.get(`${baseUrl}/Reports/allAlarmsByPriority`, { params: { 'priority': priority } }).then(response => sortAlarms(response.data)).catch(err => console.log(err, " error get priority alarm reports"))
+        axios.get(`${baseUrl}/Reports/allAlarmsByPriority`, { params: { 'priority': priority } }).then(response => sortAlarms(response.data)).catch(err => console.log(err, " error get priority alarm reports"));
     }
 
     function sortAlarms(data) {
@@ -119,7 +119,7 @@ function PriorityAlarmsReport() {
             return 0;
         });
 
-        setAlarms(data)
+        setAlarms(data);
     }
 
     return <div className={styles.report}>
@@ -209,14 +209,14 @@ function AllTagReport() {
 }
 
 function AnalogTagReport() {
-    const [tags, setTags] = useState([])
+    const [tags, setTags] = useState([]);
 
     useEffect(() => {
-        getTags()
+        getTags();
     }, [])
 
     function getTags() {
-        axios.get(`${baseUrl}/Reports/allAnalogValues`).then(response => sortTags(response.data)).catch(err => console.log(err, " error get analog tags reports"))
+        axios.get(`${baseUrl}/Reports/allAnalogValues`).then(response => sortTags(response.data)).catch(err => console.log(err, " error get analog tags reports"));
     }
 
     function sortTags(data) {
@@ -234,9 +234,8 @@ function AnalogTagReport() {
                 return 0;
             });
 
-            setTags(data)
+            setTags(data);
         }
-
     }
 
     return <div className={styles.report}>
@@ -261,14 +260,14 @@ function AnalogTagReport() {
 }
 
 function DigitalTagReport() {
-    const [tags, setTags] = useState([])
+    const [tags, setTags] = useState([]);
 
     useEffect(() => {
-        getTags()
+        getTags();
     }, [])
 
     function getTags() {
-        axios.get(`${baseUrl}/Reports/allDigitalValues`).then(response => sortTags(response.data)).catch(err => console.log(err, " error get analog tags reports"))
+        axios.get(`${baseUrl}/Reports/allDigitalValues`).then(response => sortTags(response.data)).catch(err => console.log(err, " error get analog tags reports"));
     }
 
     function sortTags(data) {
@@ -286,7 +285,7 @@ function DigitalTagReport() {
                 return 0;
             });
 
-            setTags(data)
+            setTags(data);
         }
     }
 
@@ -327,7 +326,7 @@ function SpecificTagReport() {
 
     function getTags() {
         if (tagId != -1) {
-            axios.get(`${baseUrl}/Reports/allTagValues`, { params: { 'tagId': tagId } }).then(response => sortTags(response.data)).catch(err => console.log(err, " error get analog tags reports"))
+            axios.get(`${baseUrl}/Reports/allTagValues`, { params: { 'tagId': tagId } }).then(response => sortTags(response.data)).catch(err => console.log(err, " error get analog tags reports"));
         }
     }
 
