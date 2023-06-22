@@ -1,7 +1,6 @@
 import NavBar from "@/components/navbar";
-import styles from '../styles/Reports.module.css'
+import styles from '@/styles/Reports.module.css'
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { baseUrl } from "./_app";
 import axios from "axios";
 import { getUser } from "@/helper/helper";
@@ -47,8 +46,8 @@ function AllAlarmsReport() {
 
     function sortAlarms(data) {
         data.sort((alarm1, alarm2) => {
-            let priority1 = alarm1['priority'].toLowerCase(),
-                priority2 = alarm2['priority'].toLowerCase();
+            let priority1 = alarm1['priority'],
+                priority2 = alarm2['priority'];
 
             if (priority1 < priority2) {
                 return -1;
@@ -60,8 +59,8 @@ function AllAlarmsReport() {
         });
 
         data.sort((alarm1, alarm2) => {
-            let time1 = alarm1['date'].toLowerCase(),
-                time2 = alarm2['date'].toLowerCase();
+            let time1 = alarm1['date'],
+                time2 = alarm2['date'];
 
             if (time1 < time2) {
                 return -1;
@@ -85,12 +84,10 @@ function AllAlarmsReport() {
             <thead>
                 <tr>
                     <th>Id</th>
-                    <th>Date</th>
-                    <th>Direction</th>
-                    <th>Value</th>
-                    <th>Priority</th>
-                    <th>Tag id</th>
                     <th>IO Address</th>
+                    <th>Date</th>
+                    <th>Priority</th>
+                    <th>Cause</th>
                     <th>Units</th>
                 </tr>
             </thead>
@@ -110,8 +107,8 @@ function PriorityAlarmsReport() {
 
     function sortAlarms(data) {
         data.sort((alarm1, alarm2) => {
-            let time1 = alarm1['date'].toLowerCase(),
-                time2 = alarm2['date'].toLowerCase();
+            let time1 = alarm1['date'],
+                time2 = alarm2['date'];
 
             if (time1 < time2) {
                 return -1;
@@ -138,12 +135,10 @@ function PriorityAlarmsReport() {
             <thead>
                 <tr>
                     <th>Id</th>
-                    <th>Date</th>
-                    <th>Direction</th>
-                    <th>Value</th>
-                    <th>Priority</th>
-                    <th>Tag id</th>
                     <th>IO Address</th>
+                    <th>Date</th>
+                    <th>Priority</th>
+                    <th>Cause</th>
                     <th>Units</th>
                 </tr>
             </thead>
@@ -157,13 +152,11 @@ function PriorityAlarmsReport() {
 function AlarmRecord({ alarm }) {
     return <tr>
         <td>{alarm['id']}</td>
-        <td>{alarm['date'].split('T')[0]}</td>
-        <td>{alarm['value']}</td>
-        <td>{alarm['priority']}</td>
-        <td>{alarm['tagId']}</td>
-        <td>{alarm['direction']}</td>
         <td>{alarm['address']}</td>
-        <td>{alarm['units']}</td>
+        <td>{alarm['date'].split('.')[0].replace('T', ' ')}</td>
+        <td>{alarm['priority'] == '1' ? 'LOW' : alarm['priority'] == '2' ? 'MEDIUM' : 'HIGH'}</td>
+        <td>{alarm['direction'] == 'notify_if_greater' ? `Value exceeded ${alarm['value']}` : `Value droped belowe ${alarm['value']}`}</td>
+        <td>{alarm['units'] == 'C' ? '°C' : alarm['units']}</td>
     </tr>
 }
 
@@ -179,8 +172,8 @@ function AllTagReport() {
 
     function sortTags(data) {
         data.sort((tag1, tag2) => {
-            let time1 = tag1['date'].toLowerCase(),
-                time2 = tag2['date'].toLowerCase();
+            let time1 = tag1['date'],
+                time2 = tag2['date'];
 
             if (time1 < time2) {
                 return -1;
@@ -190,8 +183,7 @@ function AllTagReport() {
             }
             return 0;
         });
-
-        setTags(data)
+        setTags(data);
     }
 
     return <div className={styles.report}>
@@ -317,17 +309,19 @@ function DigitalTagReport() {
 }
 
 function SpecificTagReport() {
-    const [tagId, setTagId] = useState(-1)
-    const [tags, setTags] = useState([])
-    const [tagIds, setTagIds] = useState([])
+    const [tagId, setTagId] = useState(-1);
+    const [tags, setTags] = useState([]);
+    const [tagIds, setTagIds] = useState([]);
 
     useEffect(() => {
-        let user = getUser()
+        let user = getUser();
         if (user != undefined) {
-            let userTags = []
-            userTags.push(...user['analogInputs'])
-            userTags.push(...user['digitalInputs'])
-            setTagIds(userTags.map(tag => tag['id']))
+            let userTags = [];
+            userTags.push(...user['analogInputs']);
+            userTags.push(...user['digitalInputs']);
+            const tagsToSet = userTags.map(tag => tag['id']);
+            setTagIds(tagsToSet);
+            setTagId(tagsToSet[0]);
         }
     }, [])
 
@@ -339,8 +333,8 @@ function SpecificTagReport() {
 
     function sortTags(data) {
         data.sort((tag1, tag2) => {
-            let value1 = tag1['value'].toLowerCase(),
-                value2 = tag2['value'].toLowerCase();
+            let value1 = tag1['value'],
+                value2 = tag2['value'];
 
             if (value1 < value2) {
                 return -1;
@@ -351,7 +345,7 @@ function SpecificTagReport() {
             return 0;
         });
 
-        setTags(data)
+        setTags(data);
     }
 
     return <div className={styles.report}>
@@ -364,16 +358,14 @@ function SpecificTagReport() {
         <table className={styles.main_table}>
             <thead>
                 <tr>
-                    <th>Id</th>
-                    <th>Tag id</th>
-                    <th>Description</th>
+                    <th>IO Address</th>
+                    <th>Tag</th>
                     <th>Value</th>
                     <th>Units</th>
-                    <th>IO Address</th>
                 </tr>
             </thead>
             <tbody>
-                {tags.map(tag => <SpecificTagRecord key={tag['address']} tag={tag} />)}
+                {tags.map(tag => <SpecificTagRecord key={tag['id']} tag={tag} />)}
             </tbody>
         </table>
     </div>
@@ -384,7 +376,7 @@ function AllTagRecord({ tag }) {
         <td>{tag['id']}</td>
         <td>{tag['address']}</td>
         <td>{tag['value']}</td>
-        <td>{tag['date']}</td>
+        <td>{tag['date'].replace('Z', '').replace('T', ' ')}</td>
     </tr>
 }
 
@@ -394,7 +386,7 @@ function AnalogTagRecord({ tag }) {
         <td>{tag['value']}</td>
         <td>{tag['lowLimit']}</td>
         <td>{tag['highLimit']}</td>
-        <td>{tag['units']}</td>
+        <td>{tag['units'] == 'C' ? '°C' : tag['units']}</td>
         <td>{tag['scanTime']}</td>
         <td>{tag['rtuId']}</td>
         <td>{tag['name']}</td>
@@ -413,24 +405,9 @@ function DigitalTagRecord({ tag }) {
 
 function SpecificTagRecord({ tag }) {
     return <tr>
-        <td>{tag['id']}</td>
-        <td>{tag['tagId']}</td>
+        <td>{tag['address']}</td>
         <td>{tag['description']}</td>
         <td>{tag['value']}</td>
-        <td>{tag['units']}</td>
-        <td>{tag['address']}</td>
-    </tr>
-}
-
-function TagRecord({ tag }) {
-    return <tr>
-        <td>id</td>
-        <td>a</td>
-        <td>a</td>
-        <td>a</td>
-        <td>a</td>
-        <td>a</td>
-        <td>a</td>
-        <td>a</td>
+        <td>{tag['units'] == 'C' ? '°C' : tag['units']}</td>
     </tr>
 }
