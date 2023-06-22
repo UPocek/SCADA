@@ -2,7 +2,7 @@ import Image from 'next/image'
 import styles from '@/styles/Home.module.css'
 import NavBar from '@/components/navbar'
 import { useEffect, useState } from 'react'
-import { getUser, getUserId } from '@/helper/helper'
+import { getUserId } from '@/helper/helper'
 import axios from 'axios'
 import { baseUrl } from './_app'
 import { HubConnectionBuilder } from '@microsoft/signalr';
@@ -20,7 +20,9 @@ export default function Home() {
 
   useEffect(() => {
     localStorage.getItem('user') == null && router.replace('/login');
-    axios.get(`${baseUrl}/User/userTagsInfo/${getUserId()}`).then(response => updateUserInfo(response.data)).catch(err => console.log("Error on user tags info"));
+    if (localStorage.getItem('user')) {
+      axios.get(`${baseUrl}/User/userTagsInfo/${getUserId()}`).then(response => updateUserInfo(response.data)).catch(err => console.log("Error on user tags info"));
+    }
     axios.get(`${baseUrl}/Tags/controls`).then(response => setControls(response.data)).catch(err => console.log("Error on controls addresses"));
     const newConnectionTags = new HubConnectionBuilder()
       .withUrl('https://localhost:7214/hubs/tags')
@@ -41,6 +43,7 @@ export default function Home() {
         .then(result => {
           console.log('Connected to Tags!');
           connectionTags.on('ReceiveMessage', message => {
+            console.log(message);
             updateTag(message['tag'], message['value'])
           });
         })
@@ -52,6 +55,7 @@ export default function Home() {
           console.log('Connected to Alarms!');
 
           connectionAlarms.on('ReceiveMessage', message => {
+            console.log(message);
             if (message['user'] == getUserId() && activeAlarms.filter(alarm => alarm['message'] == message['message']).length == 0) {
               let alarmsNew = [...activeAlarms];
               alarmsNew.push(message);
@@ -64,7 +68,10 @@ export default function Home() {
   }, [connectionTags, connectionAlarms]);
 
   function updateTag(id, value) {
-    if (tags.length <= 0) return;
+    if (tags.length <= 0) {
+      console.log("NEEEE")
+      return;
+    }
     let updatedTags = [...tags]
     for (let tag of updatedTags) {
       if (tag['id'] == id) {

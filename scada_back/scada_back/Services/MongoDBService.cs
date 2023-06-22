@@ -50,21 +50,21 @@ namespace scada_back.Services
             if (!_addressValueAnalogCollection.Find(_ => true).Any())
             {
                 ICollection<AddressValueAnalog> addressValueAnalogs = new List<AddressValueAnalog>() {
-                new AddressValueAnalog(0.0, -50.0, 50.0, "C", 1000.0, "1", "Temperature"),
-                new AddressValueAnalog(82.0, 0.0, 100.0, "% humidity", 1000.0, "2", "Humidity"),
-                new AddressValueAnalog(24.0, 0.0, 999.0, "C", 500.0, "1", "Temperature"),
-                new AddressValueAnalog(50.0, 0.0, 100.0, "% open", 2000.0, "2", "Valve"),
-                new AddressValueAnalog(1013.0, 1000.0, 1100.0, "mb", 1500.0, "1", "Pressure")};
+                new AddressValueAnalog(0.0, -50.0, 50.0, "C", 1000.0, "1", "Temperature", false),
+                new AddressValueAnalog(82.0, 0.0, 100.0, "% humidity", 1000.0, "2", "Humidity", false),
+                new AddressValueAnalog(24.0, 0.0, 999.0, "C", 500.0, "1", "Temperature", false),
+                new AddressValueAnalog(50.0, 0.0, 100.0, "% open", 2000.0, "2", "Valve", false),
+                new AddressValueAnalog(1013.0, 1000.0, 1100.0, "mb", 1500.0, "1", "Pressure", false)};
                 _addressValueAnalogCollection.InsertMany(addressValueAnalogs);
             }
             if (!_addressValueDigitalCollection.Find(_ => true).Any())
             {
                 ICollection<AddressValueDigital> addressValueDigitals = new List<AddressValueDigital>() {
-                new AddressValueDigital(0, 1000.0, "1", "Main Pump"),
-                new AddressValueDigital(1, 1000.0, "2", "Main Pump"),
-                new AddressValueDigital(0, 500.0, "1", "Filter 1"),
-                new AddressValueDigital(0, 2000.0, "2", "Filter 1"),
-                new AddressValueDigital(0, 1500.0, "1", "Second Pump")};
+                new AddressValueDigital(0, 1000.0, "1", "Main Pump", false),
+                new AddressValueDigital(1, 1000.0, "2", "Main Pump", false),
+                new AddressValueDigital(0, 500.0, "1", "Filter 1", false),
+                new AddressValueDigital(0, 2000.0, "2", "Filter 1", false),
+                new AddressValueDigital(0, 1500.0, "1", "Second Pump", false)};
                 _addressValueDigitalCollection.InsertMany(addressValueDigitals);
             }
             if (!_userCollection.Find(user => user.IsAdmin).Any())

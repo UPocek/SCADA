@@ -4,27 +4,25 @@ import axios from "axios"
 import { baseUrl } from "./_app"
 
 export default function RTUPage() {
-    const [RTUs, setRTUs] = useState({})
+    const [RTUs, setRTUs] = useState({});
 
     useEffect(() => {
-        let tags = []
-        axios.get(`${baseUrl}/Tags/analog`).then(response => tags.push(...response.data)).catch(err => console.log("Error on analog addresses"))
-        axios.get(`${baseUrl}/Tags/digital`).then(response => { tags.push(...response.data); unpackTags(tags) }).catch(err => console.log("Error on digital addresses"))
+        let tags = [];
+        axios.get(`${baseUrl}/Tags/analog`).then(response => { tags.push(...response.data); unpackTags(tags); }).catch(err => console.log("Error on analog addresses"));
+        axios.get(`${baseUrl}/Tags/digital`).then(response => { tags.push(...response.data); unpackTags(tags); }).catch(err => console.log("Error on digital addresses"));
     }, []
     )
 
     function unpackTags(data) {
-        const rtus = {}
+        const rtus = {};
 
         for (let tag of data) {
             if (!Object.keys(rtus).includes(tag['rtuId'])) {
-                rtus[tag['rtuId']] = []
+                rtus[tag['rtuId']] = [];
             }
-            rtus[tag['rtuId']].push(tag)
+            rtus[tag['rtuId']].push(tag);
         }
-        console.log(rtus)
-
-        setRTUs(rtus)
+        setRTUs(rtus);
     }
 
     return <div className={styles.mainContainer}>
@@ -48,18 +46,18 @@ function Metering({ tag }) {
     const [isOn, setIsOn] = useState(false);
     const [job, setJob] = useState(null);
     const url = tag['highLimit'] ? `${baseUrl}/Tags/analog/${tag['address']}` : `${baseUrl}/Tags/digital/${tag['address']}`
-    const getRandomValue = tag['highLimit'] ? getRandomAnalog : getRandomDigital
+    const getRandomValue = tag['highLimit'] ? getRandomAnalog : getRandomDigital;
 
     function getRandomDigital() {
         return Math.floor(Math.random() * 2);
     }
 
     function getRandomAnalog() {
-        return (Math.random() * (tag['highLimit'] - tag['lowLimit']) + tag['lowLimit']).toFixed(2)
+        return (Math.random() * (tag['highLimit'] - tag['lowLimit']) + tag['lowLimit']).toFixed(2);
     }
 
     function TurnOnTag() {
-        setIsOn(true)
+        setIsOn(true);
         setJob(setInterval(() => {
             const signal = getRandomValue()
             axios.put(url, null, {
@@ -72,8 +70,8 @@ function Metering({ tag }) {
     }
 
     function TurnOffTag() {
-        setIsOn(false)
-        clearInterval(job)
+        setIsOn(false);
+        clearInterval(job);
     }
 
     return <div >

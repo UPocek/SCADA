@@ -13,13 +13,15 @@ namespace scada_back.Models
         public double ScanTime { get; set; }
         public string RTUId { get; set; }
         public string Name { get; set; }
+        public bool OnOffScan { get; set; }
 
-        public AddressValueDigital(int value, double scanTime, string rtu, string name)
+        public AddressValueDigital(int value, double scanTime, string rtu, string name, bool onOffScan)
         {
             Value = value;
             ScanTime = scanTime;
             RTUId = rtu;
             Name = name;
+            OnOffScan = onOffScan;
         }
 
         public AddressValueDigital()

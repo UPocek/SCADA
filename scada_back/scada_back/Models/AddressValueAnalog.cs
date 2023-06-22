@@ -16,8 +16,9 @@ namespace scada_back.Models
         public double ScanTime { get; set; }
         public string RTUId { get; set; }
         public string Name { get; set; }
+        public bool OnOffScan { get; set; }
 
-        public AddressValueAnalog(double value, double lowLimit, double highLimit, string units, double scanTime, string rtu, string name)
+        public AddressValueAnalog(double value, double lowLimit, double highLimit, string units, double scanTime, string rtu, string name, bool onOffScan)
         {
             Value = value;
             LowLimit = lowLimit;
@@ -26,6 +27,7 @@ namespace scada_back.Models
             ScanTime = scanTime;
             RTUId = rtu;
             Name = name;
+            OnOffScan = onOffScan;
         }
 
         public AddressValueAnalog()
