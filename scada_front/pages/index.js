@@ -150,10 +150,12 @@ function AllTags({ tags, availableAnalogAddresses, availableDigitalAddresses, se
 function Tag({ tag, tags, setTags, setUser, user, controls }) {
   const [isOn, setIsOn] = useState(tag['onOffScan']);
   const [addNewAlarm, setAddNewAlarm] = useState(false);
-  const [newValue, setNewValue] = useState(0);
+  const [oldValue, setOldValue] = useState(0);
+  const [valueChange, setValueChange] = useState(0);
 
   useEffect(() => {
-    setNewValue(controls.find(item => item['address'] == tag['ioAddress']) ? controls.find(item => item['address'] == tag['ioAddress'])['value'] : 0);
+    setOldValue(controls.find(item => item['address'] == tag['ioAddress']) ? controls.find(item => item['address'] == tag['ioAddress'])['value'] : 0);
+    setValueChange(controls.find(item => item['address'] == tag['ioAddress']) ? controls.find(item => item['address'] == tag['ioAddress'])['value'] : 0);
   }, [controls])
 
 
@@ -186,8 +188,9 @@ function Tag({ tag, tags, setTags, setUser, user, controls }) {
   }
 
   function controlSystem(e) {
+    const newValueToSet = e.target.newValue ? e.target.newValue.value : e.target.value;
     e.preventDefault();
-    axios.put(`${baseUrl}/Tags/control/${tag['ioAddress']}?value=${e.target.newValue.value}&type=${tag['alarms'] ? 'analog' : 'digital'}`).then(response => alert(`${tag['description']} set to ${e.target.newValue.value}`)).catch(err => { console.log(err); alert("Value not set!"); setNewValue(0); })
+    axios.put(`${baseUrl}/Tags/control/${tag['ioAddress']}?value=${newValueToSet}&type=${tag['alarms'] ? 'analog' : 'digital'}`).then(response => { alert(`${tag['description']} set to ${newValueToSet}`); setOldValue(newValueToSet); }).catch(err => { alert("Value not set!"); setValueChange(oldValue); })
   }
 
   return <>
@@ -196,7 +199,7 @@ function Tag({ tag, tags, setTags, setUser, user, controls }) {
       <td>{tag['value']}</td>
       <td>
         <form onSubmit={controlSystem}>
-          <input className={styles.inputField} type="text" id="newValue" name="newValue" value={newValue} onChange={e => setNewValue(e.target.value)} />
+          {tag['alarms'] ? <input className={styles.inputField} type="text" id="newValue" name="newValue" value={valueChange} onChange={e => setValueChange(e.target.value)} /> : <select id="newValue" name="newValue" value={oldValue} className={styles.inputField} onChange={controlSystem}><option value={0}>0</option> <option value={1}>1</option></select>}
         </form>
       </td>
       <td><div className={styles.IObtns}>
@@ -217,11 +220,11 @@ function Tag({ tag, tags, setTags, setUser, user, controls }) {
 }
 
 function NewAnalogTag({ availableAddresses, setAddAnalogTag, setAvailableAddresses, tags, setTags }) {
-  const [name, setName] = useState('')
-  const [ioAddress, setIoAddress] = useState('')
-  const [lowLimit, setLowLimit] = useState(0)
-  const [highLimit, setHighLimit] = useState(0)
-  const [scanTime, setScanTime] = useState(0)
+  const [name, setName] = useState('');
+  const [ioAddress, setIoAddress] = useState(availableAddresses[0]);
+  const [lowLimit, setLowLimit] = useState(0);
+  const [highLimit, setHighLimit] = useState(0);
+  const [scanTime, setScanTime] = useState(0);
 
 
   function AddNewAnalogTag() {
@@ -236,16 +239,19 @@ function NewAnalogTag({ availableAddresses, setAddAnalogTag, setAvailableAddress
       "lowLimit": lowLimit,
       "highLimit": highLimit
     }
-    axios.post(`${baseUrl}/User/${getUserId()}/addTag/analog`, newTag).then(response => AddUserNewTag(response.data)).catch(err => console.log("Error on digital addresses"))
+    axios.post(`${baseUrl}/User/${getUserId()}/addTag/analog`, newTag).then(response => AddUserNewTag(response.data)).catch(err => console.log(err))
   }
 
   function AddUserNewTag(newTag) {
-    let newTags = [...tags]
-    newTags.push(newTag)
-    setTags(newTags)
-    availableAddresses.remove(ioAddress)
-    setAvailableAddresses(...availableAddresses)
-    setAddAnalogTag(false)
+    let newTags = [...tags];
+    newTags.push(newTag);
+    setTags(newTags);
+    const index = availableAddresses.indexOf(ioAddress);
+    if (index > -1) {
+      availableAddresses.splice(index, 1);
+    }
+    setAvailableAddresses(...availableAddresses);
+    setAddAnalogTag(false);
   }
 
   return <table className={styles.main_table}>
@@ -289,12 +295,12 @@ function NewAnalogTag({ availableAddresses, setAddAnalogTag, setAvailableAddress
 }
 
 function NewDigitalTag({ availableAddresses, setAddDigitalTag, setAvailableAddresses, tags, setTags }) {
-  const [name, setName] = useState('')
-  const [ioAddress, setIoAddress] = useState('')
-  const [scanTime, setScanTime] = useState(0)
+  const [name, setName] = useState('');
+  const [ioAddress, setIoAddress] = useState(availableAddresses[0]);
+  const [scanTime, setScanTime] = useState(0);
 
 
-  function AddNewAnalogTag() {
+  function AddNewDigitalTag() {
     if (name == '' || ioAddress == '' || scanTime == 0) {
       alert("Invalid inputs!")
       return;
@@ -311,7 +317,10 @@ function NewDigitalTag({ availableAddresses, setAddDigitalTag, setAvailableAddre
     let newTags = [...tags]
     newTags.push(newTag)
     setTags(newTags)
-    availableAddresses.remove(ioAddress)
+    const index = availableAddresses.indexOf(ioAddress);
+    if (index > -1) {
+      availableAddresses.splice(index, 1);
+    }
     setAvailableAddresses(...availableAddresses)
     setAddDigitalTag(false)
   }
@@ -338,7 +347,7 @@ function NewDigitalTag({ availableAddresses, setAddDigitalTag, setAvailableAddre
           <input className={styles.inputField} type="number" id="scanTime" name="scanTime" value={scanTime} onChange={e => setScanTime(e.target.value)} />
         </td>
         <td>
-          <div onClick={() => AddNewAnalogTag()}>
+          <div onClick={() => AddNewDigitalTag()}>
             <Image alt='add tag' src='/images/plus.png' width={24} height={24} />
           </div>
         </td>
