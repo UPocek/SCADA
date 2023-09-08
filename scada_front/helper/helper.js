@@ -1,11 +1,23 @@
 export function getUser() {
-    return JSON.parse(localStorage.getItem('user'))
+    try {
+        return JSON.parse(localStorage.getItem('user'));
+    } catch {
+        return;
+    }
 }
 
 export function getUserId() {
-    return JSON.parse(localStorage.getItem('user'))['id']
+    try {
+        return JSON.parse(localStorage.getItem('user'))['id']
+    } catch {
+        return;
+    }
 }
 
 export function getIsAdmin() {
-    return JSON.parse(localStorage.getItem('user'))['isAdmin']
+    try {
+        return JSON.parse(localStorage.getItem('user'))['isAdmin']
+    } catch {
+        return;
+    }
 }
